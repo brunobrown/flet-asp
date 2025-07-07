@@ -1,0 +1,42 @@
+[project]
+name = "fasp"
+version = "0.1.0"
+description = "FASP (Flet Atomic State Pattern) is inspired by Flutter's ASP package to offer a simplified, predictable and powerful state management solution."
+requires-python = ">=3.9"
+readme = "README.md"
+authors = [
+    { name = "brunobrown", email = "brunobrown.86@gmail.com" }
+]
+dependencies = [
+    "flet>=0.25.2",
+]
+
+classifiers = [
+    "Topic :: Software Development :: Flet",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Natural Language :: Portuguese (Brazilian)",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "flet[all]==0.25.2",
+]
+
+#[tool.setuptools]
+#packages = ["fasp"]
+#package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+"fasp" = ["**/*"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
