@@ -1,12 +1,15 @@
 [project]
 name = "fasp"
 version = "0.1.0"
-description = "FASP (Flet Atomic State Pattern) is inspired by Flutter's ASP package to offer a simplified, predictable and powerful state management solution."
+description = "Flet Atom State Pattern (FASP) – reactive state inspired by ASP Flutter"
 requires-python = ">=3.9"
 readme = "README.md"
 authors = [
     { name = "brunobrown", email = "brunobrown.86@gmail.com" }
 ]
+license = "MIT"
+license-files = []
+
 dependencies = [
     "flet>=0.25.2",
 ]
@@ -24,6 +27,12 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
+
+[project.urls]
+Homepage = "https://github.com/brunobrown/fasp"
+#Documentation = ""
+Repository = "https://github.com/brunobrown/fasp"
+Issues = "https://github.com/brunobrown/fasp/issues"
 
 [tool.uv]
 dev-dependencies = [
