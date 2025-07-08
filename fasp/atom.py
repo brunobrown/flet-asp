@@ -46,11 +46,11 @@ class Atom:
     def unlisten(self, callback: Callable[[Any], None]):
         self._listeners = [cb for cb in self._listeners if cb != callback]
 
-    def bind(self, control: Control, prop: str = "value", update: bool = True):
+    def bind(self, control: Ref, prop: str = "value", update: bool = True):
         """
         Faz bind em um Ref, atualizando sua propriedade automaticamente.
 
-        Observe: O controle deve ser adicionado à página primeiro.
+        Observe: O controle deve estar na página.
         """
 
         def listener(value):
@@ -62,15 +62,15 @@ class Atom:
 
         # Verifica se essa Ref já está registrada
         for existing_listener in self._listeners:
-            if getattr(existing_listener, "__ref__", None) is getattr(control.current, 'ref', None):
+            if getattr(existing_listener, "__ref__", None) is control:
                 return  # Já está vinculado
 
-        # Marca esse listener com sua Ref
-        listener.__ref__ = control.current.ref
+        # Marca esse listener com a Ref diretamente
+        listener.__ref__ = control
         self._listeners.append(listener)
         listener(self._value)
 
-    def bind_dynamic(self, control: Any, prop: str = "value", update: bool = True):
+    def bind_dynamic(self, control: Control | Ref, prop: str = "value", update: bool = True):
         """
         Faz bind direto em controle ou Ref e atualiza sua propriedade automaticamente.
 
@@ -124,7 +124,7 @@ class Atom:
                 if getattr(listener, "__control_id__", None) != id(target)
             ]
 
-    def bind_two_way(self, control: Control, prop: str = "value", update: bool = True):
+    def bind_two_way(self, control: Ref, prop: str = "value", update: bool = True):
         """
         Sincroniza o estado com o controle e vice-versa.
         Reage à mudança no controle e atualiza o estado, e vice-versa.

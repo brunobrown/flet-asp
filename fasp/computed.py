@@ -11,9 +11,9 @@ class Computed(Atom):
     Atualiza automaticamente sempre que qualquer dependência mudar.
     """
 
-    def __init__(self, compute_func: Callable[[Callable[[str], Any]], Any], resolve_atom: Callable[[str], Atom]):
+    def __init__(self, compute_fn: Callable[[Callable[[str], Any]], Any], resolve_atom: Callable[[str], Atom]):
         super().__init__(None)
-        self._compute_func = compute_func
+        self._compute_fn = compute_fn
         self._get_atom = resolve_atom
         self._is_updating = False
         self._dependencies: set[str] = set()
@@ -27,7 +27,7 @@ class Computed(Atom):
             self._dependencies.add(key)
             return self._get_atom(key).value
 
-        self._value = self._compute_func(getter)  # valor inicial
+        self._value = self._compute_fn(getter)  # valor inicial
 
         for key in self._dependencies:
             atom = self._get_atom(key)
@@ -42,7 +42,7 @@ class Computed(Atom):
         def getter(key: str):
             return self._get_atom(key).value
 
-        result = self._compute_func(getter)
+        result = self._compute_fn(getter)
 
         if asyncio.iscoroutine(result):
             asyncio.create_task(self._handle_async(result))

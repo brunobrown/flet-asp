@@ -56,7 +56,7 @@ class StateManager:
 
         self.atom(key).set(value)
 
-    def bind(self, key: str, control: Control, prop: str = "value", update: bool = True) -> None:
+    def bind(self, key: str, control: Ref, prop: str = "value", update: bool = True) -> None:
         """
         Liga um controle a um atom reativo, reatualizando automaticamente.
         """
@@ -66,7 +66,7 @@ class StateManager:
         else:
             self.atom(key).bind(control, prop, update)
 
-    def bind_dynamic(self, key: str, control: Any, prop: str = "value", update: bool = True):
+    def bind_dynamic(self, key: str, control: Control | Ref, prop: str = "value", update: bool = True):
         """
         Faz bind em um controle direto ou Ref, atualizando sua propriedade automaticamente.
         """
@@ -76,7 +76,7 @@ class StateManager:
         else:
             self.atom(key).bind_dynamic(control, prop, update)
 
-    def bind_two_way(self, key: str, control: Control, prop: str = "value"):
+    def bind_two_way(self, key: str, control: Ref, prop: str = "value"):
         if key in self._computed:
             raise ValueError("bind_two_way não é permitido em computed")
 
@@ -168,20 +168,7 @@ class StateManager:
         if key in self._computed:
             self._computed[key].recompute()
 
-    def register_computed_from_module(self, module_or_obj):
-        """
-        Registra todos os métodos ou funções decoradas com @computed
-        encontradas no módulo ou classe fornecida.
-        """
-
-        for name, member in inspect.getmembers(module_or_obj):
-            if callable(member) and getattr(member, "_is_computed_atom", False):
-                key = member._computed_key
-                if key not in self._computed:
-                    self.add_computed(key, member)
-
-    @staticmethod
-    def computed(key: str):
+    def computed(self, key: str):
         """
         Decorador que registra uma função como computed dentro de StateManager.
         O estado deve ser explicitamente instanciado em algum ponto.
@@ -193,9 +180,9 @@ class StateManager:
         """
 
         def decorator(func):
-            func._is_computed_atom = True
-            func._computed_key = key
-            return func
+            self.add_computed(key, func)
+            return func  # retorna a função decorada
+
         return decorator
 
 
