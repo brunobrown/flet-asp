@@ -4,20 +4,24 @@ from typing import Callable
 
 
 class TaskItem(ft.Column):
+    """
+    A reusable UI component representing a task row,
+    in edit or display mode based on the `editing` flag.
+    """
+
     def __init__(
-        self,
-        task_data: dict,
-        on_toggle: Callable,
-        on_delete: Callable,
-        on_edit: Callable,
-        on_save: Callable,
+            self,
+            task_data: dict,
+            on_toggle: Callable,
+            on_delete: Callable,
+            on_edit: Callable,
+            on_save: Callable,
     ):
         super().__init__()
         self.task_data = task_data
         self.title_ref = ft.Ref[ft.TextField]()
 
         if task_data.get("editing", False):
-            # Edit mode
             self.controls = [ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -37,7 +41,6 @@ class TaskItem(ft.Column):
                 ]
             )]
         else:
-            # View mode
             self.controls = [ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -67,14 +70,27 @@ class TaskItem(ft.Column):
 
 
 def main(page: ft.Page):
+    """
+        This example demonstrates a complete ToDo application using FASP with full reactivity. It manages tasks using:
+            * atom() for reactive task list and inputs
+            * selector() to derive the count of active tasks
+            * Action to clear completed tasks
+            * listen() to update the UI based on filter changes and task mutations
+
+        The app supports:
+            * Adding, editing, and deleting tasks
+            * Filtering by all, active, or completed
+            * Persisted updates using centralized FASP state
+        """
+
     state = fa.get_state_manager(page)
 
-    # Global state
+    # Declare reactive atoms
     state.atom("tasks", [])
     state.atom("new_task", "")
     state.atom("filter", "all")
 
-    # Refs
+    # UI references
     input_ref = ft.Ref[ft.TextField]()
     tasks_column_ref = ft.Ref[ft.Column]()
     tabs_ref = ft.Ref[ft.Tabs]()
@@ -96,10 +112,7 @@ def main(page: ft.Page):
         for t in tasks:
             if t["id"] == task_id:
                 t["completed"] = not t["completed"]
-
         state.set("tasks", tasks)
-        # state.set("new_task", '')
-
 
     def delete_task(task_id: int):
         tasks = [t for t in state.get("tasks") if t["id"] != task_id]
@@ -147,11 +160,10 @@ def main(page: ft.Page):
         ]
         tasks_column_ref.current.update()
 
-    # Computed: active task count
-    @state.computed("active_count")
+    # ✅ Selector: count active tasks
+    @state.selector("active_count")
     def count_active(get):
-        result = len([t for t in get("tasks") if not t["completed"]])
-        return result
+        return len([t for t in get("tasks") if not t["completed"]])
 
     # Action: clear completed tasks
     async def clear_completed(get, set_value, _):

@@ -3,6 +3,14 @@ import fasp as fa
 
 
 def main(page: ft.Page):
+    """
+    Basic Counter using Atom and bind() with Ref
+
+    - Atom: a named reactive state (“count”)
+    - bind(): link between the state and a UI component via Ref
+    - Increment and decrement controls
+    """
+
     # Get or create a global reactive state for this page
     state: fa.StateManager = fa.get_state_manager(page)
 

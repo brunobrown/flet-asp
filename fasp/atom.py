@@ -9,9 +9,10 @@ class Atom:
     Pode ter múltiplos ouvintes, incluindo UI (bind) ou lógica (listen).
     """
 
-    def __init__(self, value: Any):
+    def __init__(self, value: Any, key: str = None):
         self._value: Any = value
         self._listeners: List[Callable[[Any], None]] = []
+        self._key = key # Adiciona o atributo _key
 
     def __repr__(self):
         return f"<Atom(value={self._value}, listeners={len(self._listeners)})>"
@@ -21,10 +22,10 @@ class Atom:
         """Retorna o valor atual do atom."""
         return self._value
 
-    def set(self, value: Any) -> None:
+    def _set_value(self, value: Any) -> None:
         """Atualiza o valor e notifica os ouvintes se houver mudança."""
 
-        if isinstance(value, (dict, list)) or not deep_equal(self._value, value):
+        if isinstance(value, (dict, list)) or value is None or not deep_equal(self._value, value):
             self._value = value
             self._notify_listeners()
 
@@ -124,7 +125,7 @@ class Atom:
                 if getattr(listener, "__control_id__", None) != id(target)
             ]
 
-    def bind_two_way(self, control: Ref, prop: str = "value", update: bool = True):
+    def bind_two_way(self, control: Ref, prop: str = "value", set_state_callback: Callable[[str, Any], None] = None):
         """
         Sincroniza o estado com o controle e vice-versa.
         Reage à mudança no controle e atualiza o estado, e vice-versa.
@@ -132,9 +133,7 @@ class Atom:
 
         def listener(value):
             setattr(control.current, prop, value)
-
-            if update:
-                control.current.update()
+            control.current.update()
 
         listener.__control_id__ = id(control)
 
@@ -143,13 +142,18 @@ class Atom:
 
         # Reação: UI → estado
         def on_change(e):
-            self.set(getattr(control.current, prop))
+            if set_state_callback:
+                # Chama o callback do StateManager para definir o valor
+                set_state_callback(self._key, getattr(control.current, prop))
+
         control.current.on_change = on_change
 
     def clear_listeners(self) -> None:
-        """Remove todos os ouvintes registrados para este atom."""
+        """
+        Remove todos os ouvintes registrados para este atom."""
         self._listeners.clear()
 
     def has_listeners(self) -> bool:
-        """Retorna True se este atom tiver ouvintes ativos."""
+        """
+        Retorna True se este atom tiver ouvintes ativos."""
         return len(self._listeners) > 0
