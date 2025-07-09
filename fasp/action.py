@@ -12,7 +12,7 @@ class Action:
         """
         handler: função com assinatura (get, set, args) → resultado
         """
-        
+
         self.handler = handler
 
     def run(self, state: StateManager, args: Any = None):
