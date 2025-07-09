@@ -24,7 +24,7 @@ class Atom:
     def set(self, value: Any) -> None:
         """Atualiza o valor e notifica os ouvintes se houver mudança."""
 
-        if not deep_equal(self._value, value):
+        if isinstance(value, (dict, list)) or not deep_equal(self._value, value):
             self._value = value
             self._notify_listeners()
 

@@ -3,33 +3,37 @@ import fasp as fa
 
 
 def main(page: ft.Page):
+    # Get or create a global reactive state for this page
     state: fa.StateManager = fa.get_state_manager(page)
 
-    # Cria um atom chamado 'count'
-    state.set("count", 0)
+    # Create an atom named 'count' with initial value 0
+    state.atom("count", 0)
 
-    # Ref para o controle Text
+    # Create a Ref for the Text control
     count_text_ref = ft.Ref[ft.Text]()
     count_text = ft.Text(ref=count_text_ref)
 
+    # Define increment logic
     def increment(e):
         state.set("count", state.get("count") + 1)
 
+    # Define decrement logic
     def decrement(e):
         state.set("count", state.get("count") - 1)
 
-    # Cria a UI com o Text usando ref
+    # Add the UI controls to the page
     page.add(
         count_text,
         ft.Row(
             controls=[
-                ft.ElevatedButton(text="increment", on_click=increment),
-                ft.ElevatedButton(text="decrement", on_click=decrement),
+                ft.ElevatedButton(text="Increment", on_click=increment),
+                ft.ElevatedButton(text="Decrement", on_click=decrement),
             ]
         )
     )
 
-    # Faz o vínculo após o Text estar adicionado à página
+    # Bind the 'count' atom to the Text control using the ref
+    # Must be called after the control is on the page
     state.bind("count", count_text_ref, prop="value")
 
 

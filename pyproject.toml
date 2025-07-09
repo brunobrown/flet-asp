@@ -12,6 +12,7 @@ license-files = []
 
 dependencies = [
     "flet>=0.25.2",
+    "ujson>=5.10.0",
 ]
 
 classifiers = [

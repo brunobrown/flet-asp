@@ -6,11 +6,11 @@ import fasp as fa
 def main(page: ft.Page):
     state: fa.StateManager = fa.get_state_manager(page)
 
-    state.set("email", "")
-    state.set("password", "")
-    state.set("user", None)
-    state.set("loading", False)
-    state.set("error", "")
+    state.atom("email", "")
+    state.atom("password", "")
+    state.atom("user", None)
+    state.atom("loading", False)
+    state.atom("error", "")
 
     # UI refs
     email_input_ref = ft.Ref[ft.TextField]()

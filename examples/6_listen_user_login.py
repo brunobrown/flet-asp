@@ -6,9 +6,9 @@ import fasp as fa
 def main(page: ft.Page):
     state = fa.get_state_manager(page)
 
-    state.set("email", "")
-    state.set("password", "")
-    state.set("user", None)
+    state.atom("email", "")
+    state.atom("password", "")
+    state.atom("user", None)
 
     # Refs
     email_ref = ft.Ref[ft.TextField]()
