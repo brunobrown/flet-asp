@@ -209,6 +209,7 @@ def main(page: ft.Page):
 
     # Bindings
     state.bind("active_count", active_count_ref, prop="value")
+    state.bind("new_task", input_ref, prop="value")
 
     # Listeners
     state.listen("tasks", render_tasks)

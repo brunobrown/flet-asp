@@ -5,38 +5,74 @@ from fasp.utils import deep_equal
 
 class Atom:
     """
-    Representa uma unidade de estado reativo.
-    Pode ter múltiplos ouvintes, incluindo UI (bind) ou lógica (listen).
+    A reactive and observable unit of state.
+
+    Atoms store raw values and notify listeners or UI bindings when updated.
+    This class is the core of the FASP pattern, enabling one-way or two-way reactivity.
+
+    NOTE: To ensure predictability, this class does not expose a public `set()` method.
+    Use `StateManager.set(key, value)` to update the atom value.
+
+    Attributes:
+        _value (Any): The current state value.
+        _listeners (list[Callable]): Functions to call when value changes.
+        key (str): Optional identifier for debug purposes.
     """
 
-    def __init__(self, value: Any, key: str = None):
+    def __init__(self, value: Any, key: str = ""):
+        """
+        Initializes a new Atom.
+
+        Args:
+            value (Any): Initial state value.
+            key (str, optional): Debug identifier.
+        """
+
         self._value: Any = value
         self._listeners: List[Callable[[Any], None]] = []
-        self._key = key # Adiciona o atributo _key
+        self.key: str = key
 
     def __repr__(self):
-        return f"<Atom(value={self._value}, listeners={len(self._listeners)})>"
+        return f"<Atom(key='{self.key}', value={self._value}, listeners={len(self._listeners)})>"
 
     @property
     def value(self) -> Any:
-        """Retorna o valor atual do atom."""
+        """
+        Gets the current value of the atom.
+
+        Returns:
+            Any: Current value.
+        """
+
         return self._value
 
     def _set_value(self, value: Any) -> None:
-        """Atualiza o valor e notifica os ouvintes se houver mudança."""
+        """
+        Updates the atom value and notifies listeners if it changed.
 
-        if isinstance(value, (dict, list)) or value is None or not deep_equal(self._value, value):
+        NOTE: This should only be called by StateManager.
+
+        Args:
+            value (Any): New value.
+        """
+
+        if isinstance(value, (dict, list)) or not deep_equal(self._value, value):
             self._value = value
             self._notify_listeners()
 
     def _notify_listeners(self) -> None:
+        """Calls all listeners with the updated value."""
+
         for callback in self._listeners:
             callback(self._value)
 
     def listen(self, callback: Callable[[Any], None], immediate: bool = True) -> None:
         """
-        Adiciona um ouvinte que será chamado sempre que o valor mudar.
-        Se `immediate` for True, o ouvinte será chamado imediatamente com o valor atual.
+        Adds a listener that will be called when the value changes.
+
+        Args:
+            callback (Callable): The function to call.
+            immediate (bool): If True, call immediately with current value.
         """
 
         if callback not in self._listeners:
@@ -45,37 +81,50 @@ class Atom:
                 callback(self._value)
 
     def unlisten(self, callback: Callable[[Any], None]):
+        """
+        Removes a previously registered listener.
+
+        Args:
+            callback (Callable): Listener to remove.
+        """
+
         self._listeners = [cb for cb in self._listeners if cb != callback]
 
     def bind(self, control: Ref, prop: str = "value", update: bool = True):
         """
-        Faz bind em um Ref, atualizando sua propriedade automaticamente.
+        Binds the atom to a UI control (Ref).
 
-        Observe: O controle deve estar na página.
+        Automatically updates the control's property when the value changes.
+
+        Args:
+            control (Ref): A Flet Ref to the UI component.
+            prop (str): The property to update (e.g., "value").
+            update (bool): Whether to call `update()` after setting the property.
         """
 
         def listener(value):
             if control.current is not None:
                 setattr(control.current, prop, value)
-
                 if update:
                     control.current.update()
 
-        # Verifica se essa Ref já está registrada
+        # Prevent duplicate bindings
         for existing_listener in self._listeners:
             if getattr(existing_listener, "__ref__", None) is control:
-                return  # Já está vinculado
+                return
 
-        # Marca esse listener com a Ref diretamente
         listener.__ref__ = control
         self._listeners.append(listener)
         listener(self._value)
 
     def bind_dynamic(self, control: Control | Ref, prop: str = "value", update: bool = True):
         """
-        Faz bind direto em controle ou Ref e atualiza sua propriedade automaticamente.
+        Binds the atom to either a control or a Ref dynamically.
 
-        Observe: O controle deve ser adicionado à página primeiro.
+        Args:
+            control (Control | Ref): Control or Ref instance.
+            prop (str): UI property to update.
+            update (bool): Call update() after assignment.
         """
 
         is_ref = hasattr(control, "current")
@@ -84,25 +133,20 @@ class Atom:
         def listener(value):
             if target is not None:
                 setattr(target, prop, value)
-
                 if update:
                     target.update()
 
         for existing_listener in self._listeners:
             if is_ref:
-                # Verifica se essa Ref já está registrada
                 if getattr(existing_listener, "__ref__", None) is getattr(target, 'ref', None):
-                    return  # Já está vinculado
+                    return
             else:
-                # Verifica se esse Control já está registrado
                 if getattr(existing_listener, "__control_id__", None) == id(target):
-                    return # Já está vinculado
+                    return
 
         if is_ref:
-            # Marca esse listener com a Ref
             listener.__ref__ = target.current.ref
         else:
-            # Marca esse listener com o control
             listener.__control_id__ = id(target)
 
         self._listeners.append(listener)
@@ -110,7 +154,10 @@ class Atom:
 
     def unbind(self, target: Control | Ref):
         """
-        Remove o listener associado a uma Ref ou Control.
+        Removes the listener bound to a specific control or Ref.
+
+        Args:
+            target (Control | Ref): UI component or Ref to unbind.
         """
 
         if isinstance(target, Ref):
@@ -118,42 +165,53 @@ class Atom:
                 listener for listener in self._listeners
                 if getattr(listener, "__ref__", None) is not target
             ]
-
         elif isinstance(target, Control):
             self._listeners = [
                 listener for listener in self._listeners
                 if getattr(listener, "__control_id__", None) != id(target)
             ]
 
-    def bind_two_way(self, control: Ref, prop: str = "value", set_state_callback: Callable[[str, Any], None] = None):
+    def bind_two_way(self, control: Ref, prop: str = "value", update: bool = True, on_input_change: Callable = None):
         """
-        Sincroniza o estado com o controle e vice-versa.
-        Reage à mudança no controle e atualiza o estado, e vice-versa.
+        Creates a two-way binding between the atom and an input control.
+
+        This allows updating the UI when the state changes and vice versa.
+
+        Args:
+            control (Ref): Ref of the UI input.
+            prop (str): Property to sync.
+            update (bool): Whether to update the control visually.
+            on_input_change (Callable, optional): Custom change handler.
         """
 
         def listener(value):
             setattr(control.current, prop, value)
-            control.current.update()
+            if update:
+                control.current.update()
 
         listener.__control_id__ = id(control)
-
-        # Reação: estado → UI
         self.listen(listener)
 
-        # Reação: UI → estado
+        # Input → state
         def on_change(e):
-            if set_state_callback:
-                # Chama o callback do StateManager para definir o valor
-                set_state_callback(self._key, getattr(control.current, prop))
+            new_value = getattr(control.current, prop)
+            self._set_value(new_value)
 
-        control.current.on_change = on_change
+        control.current.on_change = on_input_change or on_change
 
     def clear_listeners(self) -> None:
         """
-        Remove todos os ouvintes registrados para este atom."""
+        Removes all listeners (UI or logic) from this atom.
+        """
+
         self._listeners.clear()
 
     def has_listeners(self) -> bool:
         """
-        Retorna True se este atom tiver ouvintes ativos."""
+        Checks whether the atom has any active listeners.
+
+        Returns:
+            bool: True if listeners exist.
+        """
+
         return len(self._listeners) > 0
