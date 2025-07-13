@@ -145,7 +145,7 @@ class Atom:
                     return
 
         if is_ref:
-            listener.__ref__ = target.current.ref
+            listener.__ref__ = target
         else:
             listener.__control_id__ = id(target)
 

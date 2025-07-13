@@ -131,7 +131,7 @@ class StateManager:
         else:
             self.atom(key).bind_dynamic(control, prop, update)
 
-    def bind_two_way(self, key: str, control: Ref, prop: str = "value"):
+    def bind_two_way(self, key: str, control: Ref, prop: str = "value", update: bool = True, on_input_change: Callable = None):
         """
         Creates a two-way binding between Atom and a Ref input (e.g. TextField).
 
@@ -139,12 +139,14 @@ class StateManager:
             key (str): Atom key.
             control (Ref): Input control.
             prop (str): Property to sync (default: "value").
+            update: (bool): Call `update()` after change.
+            on_input_change (Callable, optional): Custom change handler.
         """
 
         if key in self._selectors:
             raise ValueError("bind_two_way is not supported for selectors")
 
-        self.atom(key).bind_two_way(control, prop, self.set)
+        self.atom(key).bind_two_way(control, prop, update, on_input_change)
 
     def unbind(self, key: str, target: Control | Ref):
         """
