@@ -160,7 +160,7 @@ def main(page: ft.Page):
         ]
         tasks_column_ref.current.update()
 
-    # ✅ Selector: count active tasks
+    # Selector: count active tasks
     @state.selector("active_count")
     def count_active(get):
         return len([t for t in get("tasks") if not t["completed"]])
