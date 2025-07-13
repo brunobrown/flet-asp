@@ -1,5 +1,4 @@
-<!--<p align="center"><img src="https://github.com/user-attachments/assets/5482033f-5dd8-4097-bd58-1da636494ca6" width="25%" alt="fasp"></p>-->
-<p align="center"><img src="https://github.com/user-attachments/assets/c61f7759-d750-4521-bee3-e41db383ec71" width="25%" alt="fasp"></p>
+<p align="center"><img src="https://github.com/user-attachments/assets/84c2835b-9356-42ae-8a78-7c3ac11679c1" width="25%" alt="fasp"></p>
 <h1 align="center"> FASP - Flet Atomic State Pattern</h1>
 
 ---
@@ -97,7 +96,8 @@ Explore the [`examples/`](./examples/) folder for full apps:
 ---
 
 ## 🧩 Design System Ready
-<p align="center"><img src="https://github.com/user-attachments/assets/c61f7759-d750-4521-bee3-e41db383ec71" width="25%" alt="fasp"></p>
+<!--<p align="center"><img src="https://github.com/user-attachments/assets/1c620722-4f3f-4900-948b-aec59999f955" width="1000" height="200" alt="atomic_design"/></p>-->
+<p align="center"><img src="https://github.com/user-attachments/assets/fef1f45c-31bb-4c6f-a944-5d60f0b0b259" width="1000" height="200" alt="atomic_design"/></p>
 
 **FASP** also allows you to create applications following the `Atomic Design System`, just like Flutter.
 
