@@ -2,13 +2,13 @@ from flet import Page, Control
 from typing import Any, Callable, Dict, Optional
 from flet.core.ref import Ref
 
-from fasp.atom import Atom
-from fasp.selector import Selector
+from flet_asp.atom import Atom
+from flet_asp.selector import Selector
 
 
 class StateManager:
     """
-    A reactive global state manager following the Atom/Selector pattern (FASP).
+    A reactive global state manager following the Atom/Selector pattern (Flet-ASP).
 
     Each key represents an isolated Atom or derived Selector. Useful for building
     modular and predictable UI state.

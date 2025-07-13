@@ -1,11 +1,11 @@
 import asyncio
 import flet as ft
-import fasp as fa
+import flet_asp as fa
 
 
 def main(page: ft.Page):
     """
-    This example demonstrates how to use the Action class in FASP to encapsulate an asynchronous operation, such as a login request.
+    This example demonstrates how to use the Action class in Flet-ASP to encapsulate an asynchronous operation, such as a login request.
     It simulates a simple authentication form that updates UI state reactively:
 
     - A loading spinner is shown during login

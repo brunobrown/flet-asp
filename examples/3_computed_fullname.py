@@ -1,10 +1,10 @@
 import flet as ft
-import fasp as fa
+import flet_asp as fa
 
 
 def main(page: ft.Page):
     """
-    This example demonstrates how to define a derived state in FASP using the @selector(...) decorator.
+    This example demonstrates how to define a derived state in FletASP using the @selector(...) decorator.
     The selector named "full_name" is built from two base atoms: "first_name" and "last_name".
 
     Whenever either atom changes, the selector is automatically recomputed, and the UI is updated reactively.
@@ -14,7 +14,7 @@ def main(page: ft.Page):
     - No need for manual updates or imperative logic
     """
 
-    # Create or retrieve the FASP state manager for this page
+    # Create or retrieve the FletASP state manager for this page
     state = fa.get_state_manager(page)
 
     # Declare two base atoms for first and last name

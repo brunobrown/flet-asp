@@ -1,11 +1,11 @@
 import asyncio
 import flet as ft
-import fasp as fa
+import flet_asp as fa
 
 
 def main(page: ft.Page):
     """
-    This example shows how to use the listen() method in FASP to observe changes to a specific atom ("user"), and trigger side effects such as manual UI updates.
+    This example shows how to use the listen() method in Flet-ASP to observe changes to a specific atom ("user"), and trigger side effects such as manual UI updates.
     Instead of binding a control directly to a value (bind()), it listens to a state and reacts accordingly.
 
     * User types credentials and clicks Login

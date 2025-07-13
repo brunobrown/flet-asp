@@ -1,10 +1,10 @@
 import flet as ft
-import fasp as fa
+import flet_asp as fa
 
 
 def main(page: ft.Page):
     """
-    This example demonstrates how to use bind_two_way() in FASP to create a synchronized link between a UI control (TextField) and an atom. Any change in:
+    This example demonstrates how to use bind_two_way() in Flet-ASP to create a synchronized link between a UI control (TextField) and an atom. Any change in:
         * the input field updates the atom
         * the atom value updates the input field
 
@@ -15,7 +15,7 @@ def main(page: ft.Page):
     - Console prints the current value whenever it changes
     """
 
-    # Get the page-specific FASP state manager
+    # Get the page-specific Flet-ASP state manager
     state = fa.get_state_manager(page)
 
     # Declare the message atom with an initial value

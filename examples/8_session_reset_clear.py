@@ -1,11 +1,11 @@
 import asyncio
 import flet as ft
-import fasp as fa
+import flet_asp as fa
 
 
 def main(page: ft.Page):
     """
-    This example shows how to manage session cleanup in FASP using two key methods:
+    This example shows how to manage session cleanup in Flet-ASP using two key methods:
         * reset(key, value) → updates specific atoms without affecting others
         * clear() → removes all atoms, selectors, listeners and bindings from the state
 
@@ -15,7 +15,7 @@ def main(page: ft.Page):
         * Restarting the session completely
     """
 
-    # Initialize the FASP state manager for this page
+    # Initialize the Flet-ASP state manager for this page
     state = fa.get_state_manager(page)
 
     # Declare reactive atoms
@@ -58,7 +58,7 @@ def main(page: ft.Page):
     # Clear entire state (atoms, listeners, binds)
     def on_logout_click(e):
         state.clear()
-        print("[FASP] All atoms, bindings, and listeners removed. State cleared.")
+        print("[Flet-ASP] All atoms, bindings, and listeners removed. State cleared.")
 
     # Build the UI
     page.add(

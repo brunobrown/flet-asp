@@ -1,12 +1,12 @@
 import flet as ft
-import fasp as fa
+import flet_asp as fa
 
 
 def main(page: ft.Page):
     """
     Basic Counter using Atom and bind_dynamic() without Ref
 
-    This example demonstrates how to use FASP's bind_dynamic() to connect an Atom state directly to a UI control, without using a Ref.
+    This example demonstrates how to use Flet-ASP's bind_dynamic() to connect an Atom state directly to a UI control, without using a Ref.
     It is similar to the previous example, but uses direct control reference instead of Ref. This is often more convenient and readable for small UIs.
 
     - A Text widget displays the current "count" value

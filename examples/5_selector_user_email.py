@@ -1,11 +1,11 @@
 import asyncio
 import flet as ft
-import fasp as fa
+import flet_asp as fa
 
 
 def main(page: ft.Page):
     """
-    This example demonstrates how to use a Selector in FASP to derive and listen to a specific property inside an object (in this case, user["email"]).
+    This example demonstrates how to use a Selector in Flet-ASP to derive and listen to a specific property inside an object (in this case, user["email"]).
     Instead of binding the entire user atom, this approach focuses only on what matters — the email.
     The derived value is updated and applied without using bind(), via a manual update.
 
@@ -20,7 +20,7 @@ def main(page: ft.Page):
     """
 
 
-    # Create the FASP state manager for this page
+    # Create the Flet-ASP state manager for this page
     state: fa.StateManager = fa.get_state_manager(page)
 
     # Declare base atoms

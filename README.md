@@ -1,11 +1,11 @@
-<p align="center"><img src="https://github.com/user-attachments/assets/84c2835b-9356-42ae-8a78-7c3ac11679c1" width="25%" alt="fasp"></p>
-<h1 align="center"> FASP - Flet Atomic State Pattern</h1>
+<p align="center"><img src="https://github.com/user-attachments/assets/84c2835b-9356-42ae-8a78-7c3ac11679c1" width="25%" alt="flet-asp"></p>
+<h1 align="center"> Flet-ASP - Flet Atomic State Pattern</h1>
 
 ---
 
 ## 📖 Overview
 
-**FASP** (Flet Atomic State Pattern) is a reactive state management library for [Flet](https://flet.dev), bringing atom-based architecture and separation of concerns into Python apps — inspired by Flutter's [Riverpod](https://riverpod.dev) and [ASP](https://pub.dev/packages/asp).
+**Flet-ASP** (Flet Atomic State Pattern) is a reactive state management library for [Flet](https://flet.dev), bringing atom-based architecture and separation of concerns into Python apps — inspired by Flutter's [Riverpod](https://riverpod.dev) and [ASP](https://pub.dev/packages/asp).
 
 It provides predictable, testable, and declarative state through:
 - `Atom` – single reactive unit of state
@@ -19,19 +19,19 @@ Install using your package manager of choice:
 **Pip**
 
 ```bash
-pip install fasp
+pip install flet-asp
 ```
 
 **Poetry**
 
 ```bash
-poetry add fasp
+poetry add flet-asp
 ```
 
 **UV**
 
 ```bash
-uv add fasp
+uv add flet-asp
 ```
 
 ---
@@ -51,7 +51,7 @@ uv add fasp
 
 ```python
 import flet as ft
-import fasp as fa
+import flet-asp as fa
 
 
 def main(page: ft.Page):
@@ -99,9 +99,9 @@ Explore the [`examples/`](./examples/) folder for full apps:
 <!--<p align="center"><img src="https://github.com/user-attachments/assets/1c620722-4f3f-4900-948b-aec59999f955" width="1000" height="200" alt="atomic_design"/></p>-->
 <p align="center"><img src="https://github.com/user-attachments/assets/fef1f45c-31bb-4c6f-a944-5d60f0b0b259" width="1000" height="200" alt="atomic_design"/></p>
 
-**FASP** also allows you to create applications following the `Atomic Design System`, just like Flutter.
+**Flet-ASP** also allows you to create applications following the `Atomic Design System`, just like Flutter.
 
-| Atomic Layer | How FASP Helps                                                                                       |
+| Atomic Layer | How Flet-ASP Helps                                                                                       |
 |--------------|------------------------------------------------------------------------------------------------------|
 | **Atoms**    | Simple reactive values (e.g., `atom("email")`, `atom("count")`, `atom("message")`, `atom("loading")` |
 | **Selectors**| Derived state (e.g., `@selector("full_name")`, `@selector("total_price")` or `Selector(...)`)        |
@@ -121,11 +121,11 @@ Explore the [`examples/`](./examples/) folder for full apps:
 #### Join the community to contribute or get help:
 
 1. [Discord](https://discord.gg/5xJ7qvWM)
-2. [Report an issue](https://github.com/brunobrown/fasp/issues)
+2. [Report an issue](https://github.com/brunobrown/flet-asp/issues)
 
 ## ⭐ Support
 
-If you like this project, please give it a [GitHub star](https://github.com/brunobrown/fasp) and stay tuned for future updates!
+If you like this project, please give it a [GitHub star](https://github.com/brunobrown/flet-asp) and stay tuned for future updates!
 
 ## 🤝🏽 Contributing
 

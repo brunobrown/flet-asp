@@ -1,5 +1,5 @@
 import flet as ft
-import fasp as fa
+import flet_asp as fa
 from typing import Callable
 
 
@@ -71,7 +71,7 @@ class TaskItem(ft.Column):
 
 def main(page: ft.Page):
     """
-        This example demonstrates a complete ToDo application using FASP with full reactivity. It manages tasks using:
+        This example demonstrates a complete ToDo application using Flet-ASP with full reactivity. It manages tasks using:
             * atom() for reactive task list and inputs
             * selector() to derive the count of active tasks
             * Action to clear completed tasks
@@ -80,7 +80,7 @@ def main(page: ft.Page):
         The app supports:
             * Adding, editing, and deleting tasks
             * Filtering by all, active, or completed
-            * Persisted updates using centralized FASP state
+            * Persisted updates using centralized Flet-ASP state
         """
 
     state = fa.get_state_manager(page)
@@ -172,10 +172,10 @@ def main(page: ft.Page):
     clear_completed_action = fa.Action(clear_completed)
 
     # UI layout
-    page.title = "ToDo App (FASP)"
+    page.title = "ToDo App (Flet-ASP)"
     page.add(
         ft.Column([
-            ft.Text("📋 ToDo with FASP", style=ft.TextThemeStyle.HEADLINE_MEDIUM),
+            ft.Text("📋 ToDo with Flet-ASP", style=ft.TextThemeStyle.HEADLINE_MEDIUM),
             ft.Row([
                 ft.TextField(
                     ref=input_ref,

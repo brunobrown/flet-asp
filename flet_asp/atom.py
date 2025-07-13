@@ -1,6 +1,6 @@
 from flet import Control, Ref
 from typing import Any, Callable, List
-from fasp.utils import deep_equal
+from flet_asp.utils import deep_equal
 
 
 class Atom:
@@ -8,7 +8,7 @@ class Atom:
     A reactive and observable unit of state.
 
     Atoms store raw values and notify listeners or UI bindings when updated.
-    This class is the core of the FASP pattern, enabling one-way or two-way reactivity.
+    This class is the core of the Flet-ASP pattern, enabling one-way or two-way reactivity.
 
     NOTE: To ensure predictability, this class does not expose a public `set()` method.
     Use `StateManager.set(key, value)` to update the atom value.

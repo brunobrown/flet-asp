@@ -1,5 +1,5 @@
 import flet as ft
-import fasp as fa
+import flet_asp as fa
 from typing import Callable
 
 
@@ -22,7 +22,7 @@ class ProductCard(ft.Card):
 
 def main(page: ft.Page):
     """
-    This example demonstrates a shopping cart UI using FASP state management. It includes:
+    This example demonstrates a shopping cart UI using Flet-ASP state management. It includes:
         * A product catalog
         * Cart management with list of items
         * Derived total price and item count
@@ -87,7 +87,7 @@ def main(page: ft.Page):
         item_count_ref.current.update()
 
     # Page UI
-    page.title = "🛒 Shopping Cart (FASP)"
+    page.title = "🛒 Shopping Cart (Flet-ASP)"
     page.add(
         ft.Column([
             ft.Text("🛍️ Products", style=ft.TextThemeStyle.HEADLINE_SMALL),

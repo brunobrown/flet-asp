@@ -1,8 +1,8 @@
 import asyncio
 import copy
 from typing import Any, Callable
-from fasp.atom import Atom
-from fasp.utils import deep_equal
+from flet_asp.atom import Atom
+from flet_asp.utils import deep_equal
 
 
 class Selector(Atom):

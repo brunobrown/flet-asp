@@ -1,7 +1,7 @@
 [project]
-name = "fasp"
+name = "flet-asp"
 version = "0.1.0"
-description = "FASP – The Flet Atomic State Pattern is a reactive state management library for Flet."
+description = "Flet-ASP – The Flet Atomic State Pattern is a reactive state management library for Flet."
 requires-python = ">=3.9"
 readme = "README.md"
 authors = [
@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 classifiers = [
-    "Topic :: Software Development :: Flet",
+    "Topic :: Software Development :: Libraries",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: OS Independent",
@@ -30,10 +30,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/brunobrown/fasp"
+Homepage = "https://github.com/brunobrown/flet-asp"
 #Documentation = ""
-Repository = "https://github.com/brunobrown/fasp"
-Issues = "https://github.com/brunobrown/fasp/issues"
+Repository = "https://github.com/brunobrown/flet-asp"
+Issues = "https://github.com/brunobrown/flet-asp/issues"
 
 [tool.uv]
 dev-dependencies = [
@@ -41,11 +41,11 @@ dev-dependencies = [
 ]
 
 #[tool.setuptools]
-#packages = ["fasp"]
+#packages = ["flet-asp"]
 #package-dir = {"" = "src"}
 
 [tool.setuptools.package-data]
-"fasp" = ["**/*"]
+"flet_asp" = ["**/*"]
 
 [build-system]
 requires = ["setuptools"]
