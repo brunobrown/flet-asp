@@ -1,7 +1,7 @@
 [project]
 name = "fasp"
 version = "0.1.0"
-description = "FASP – The Flet Atomic State Pattern is a simplified, predictable and advanced state management solution inspired by the Flutter ASP package."
+description = "FASP – The Flet Atomic State Pattern is a reactive state management library for Flet."
 requires-python = ">=3.9"
 readme = "README.md"
 authors = [
@@ -19,9 +19,9 @@ classifiers = [
     "Topic :: Software Development :: Flet",
     "Intended Audience :: Developers",
     "Natural Language :: English",
-    "Natural Language :: Portuguese (Brazilian)",
     "Operating System :: OS Independent",
     "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
