@@ -14,6 +14,9 @@ def main(page: ft.Page):
     - The value is updated automatically via reactive state
     """
 
+    page.title = "Flet-ASP Counter Example"
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+
     # Create or retrieve a unique state manager for this page
     state: fa.StateManager = fa.get_state_manager(page)
 
@@ -21,7 +24,7 @@ def main(page: ft.Page):
     state.atom("count", 0)
 
     # Direct control, no Ref needed
-    count_text = ft.Text()
+    count_text = ft.TextField(width=100, text_align=ft.TextAlign.RIGHT)
 
     # Define increment logic
     def increment(e):
@@ -33,12 +36,18 @@ def main(page: ft.Page):
 
     # Build the UI
     page.add(
-        count_text,
-        ft.Row(
+        ft.Column(
             controls=[
-                ft.ElevatedButton(text="Increment", on_click=increment),
-                ft.ElevatedButton(text="Decrement", on_click=decrement),
-            ]
+                count_text,
+                ft.Row(
+                    controls=[
+                        ft.ElevatedButton("-", on_click=decrement),
+                        ft.ElevatedButton("+", on_click=increment),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+            ],
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
     )
 

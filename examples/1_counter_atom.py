@@ -11,38 +11,42 @@ def main(page: ft.Page):
     - Increment and decrement controls
     """
 
+    page.title = "Flet-ASP Counter Example"
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+
     # Get or create a global reactive state for this page
-    state: fa.StateManager = fa.get_state_manager(page)
+    state = fa.get_state_manager(page)
 
     # Create an atom named 'count' with initial value 0
     state.atom("count", 0)
 
     # Create a Ref for the Text control
-    count_text_ref = ft.Ref[ft.Text]()
-    count_text = ft.Text(ref=count_text_ref)
+    text_number_ref = ft.Ref[ft.TextField]()
+    text_number = ft.TextField(ref=text_number_ref, text_align=ft.TextAlign.RIGHT, width=100)
 
     # Define increment logic
-    def increment(e):
-        state.set("count", state.get("count") + 1)
+    def minus_click(e):
+        state.set("count", state.get("count") - 1)
 
     # Define decrement logic
-    def decrement(e):
-        state.set("count", state.get("count") - 1)
+    def plus_click(e):
+        state.set("count", state.get("count") + 1)
 
     # Add the UI controls to the page
     page.add(
-        count_text,
         ft.Row(
             controls=[
-                ft.ElevatedButton(text="Increment", on_click=increment),
-                ft.ElevatedButton(text="Decrement", on_click=decrement),
-            ]
+                ft.IconButton(icon=ft.Icons.REMOVE, on_click=minus_click),
+                text_number,
+                ft.IconButton(icon=ft.Icons.ADD, on_click=plus_click),
+            ],
+            alignment=ft.MainAxisAlignment.CENTER,
         )
     )
 
     # Bind the 'count' atom to the Text control using the ref
     # Must be called after the control is on the page
-    state.bind("count", count_text_ref, prop="value")
+    state.bind("count", text_number_ref, prop="value")
 
 
 if __name__ == "__main__":
