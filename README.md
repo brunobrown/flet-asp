@@ -120,7 +120,7 @@ Explore the [`examples/`](./examples/) folder for full apps:
 
 #### Join the community to contribute or get help:
 
-1. [Discord](https://discord.gg/5xJ7qvWM)
+1. [Discord](https://discord.gg/dzWXP8SHG8)
 2. [Report an issue](https://github.com/brunobrown/flet-asp/issues)
 
 ## ⭐ Support
@@ -147,7 +147,7 @@ Contributions and feedback are welcome!
 
 #### 🕓 Waiting for help?
 
-Be patient — or reach out to the community on [Discord](https://discord.gg/5xJ7qvWM) for quicker responses.
+Be patient — or reach out to the community on [Discord](https://discord.gg/dzWXP8SHG8) for quicker responses.
 
 ---
 
