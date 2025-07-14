@@ -1,11 +1,11 @@
 <p align="center"><img src="https://github.com/user-attachments/assets/84c2835b-9356-42ae-8a78-7c3ac11679c1" width="25%" alt="flet-asp"></p>
-<h1 align="center"> Flet-ASP - Flet Atomic State Pattern</h1>
+<h1 align="center"> Flet ASP - Flet Atomic State Pattern</h1>
 
 ---
 
 ## 📖 Overview
 
-**Flet-ASP** (Flet Atomic State Pattern) is a reactive state management library for [Flet](https://flet.dev), bringing atom-based architecture and separation of concerns into Python apps — inspired by Flutter's [Riverpod](https://riverpod.dev) and [ASP](https://pub.dev/packages/asp).
+**Flet ASP** (Flet Atomic State Pattern) is a reactive state management library for [Flet](https://flet.dev), bringing atom-based architecture and separation of concerns into Python apps — inspired by Flutter's [Riverpod](https://riverpod.dev) and [ASP](https://pub.dev/packages/asp).
 
 It provides predictable, testable, and declarative state through:
 - `Atom` – single reactive unit of state
