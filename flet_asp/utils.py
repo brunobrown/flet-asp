@@ -1,9 +1,5 @@
+import json
 from typing import Any
-
-try:
-    import ujson as json
-except ImportError:
-    import json
 
 
 def deep_equal(a: Any, b: Any) -> bool:
