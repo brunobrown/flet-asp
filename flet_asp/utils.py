@@ -6,7 +6,7 @@ def deep_equal(a: Any, b: Any) -> bool:
     """
     Performs a deep comparison between two values.
 
-    This function serializes both values using `ujson.dumps()` with sorted keys
+    This function serializes both values using `json.dumps()` with sorted keys
     to ensure structural equality, especially for nested dictionaries and lists.
 
     If the values are unserializable (e.g., contain functions), it falls back to `a == b`.
