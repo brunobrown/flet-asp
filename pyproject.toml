@@ -1,6 +1,6 @@
 [project]
 name = "flet-asp"
-version = "0.1.1"
+version = "0.1.2"
 description = "Flet-ASP – The Flet Atomic State Pattern is a reactive state management library for Flet."
 requires-python = ">=3.9"
 readme = "README.md"
@@ -12,7 +12,6 @@ license-files = []
 
 dependencies = [
     "flet>=0.25.2",
-    "ujson>=5.10.0",
 ]
 
 classifiers = [
