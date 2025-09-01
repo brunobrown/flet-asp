@@ -307,8 +307,9 @@ def get_state_manager(page: Page) -> StateManager:
     Returns:
         StateManager: Unique manager instance for the page.
     """
-
     if not hasattr(page, "_state_manager"):
-        setattr(page, "_state_manager", StateManager())
+        manager = StateManager()
+        setattr(page, "_state_manager", manager)
+        setattr(page, "state", manager)
 
     return getattr(page, "_state_manager")
