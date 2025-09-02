@@ -23,9 +23,7 @@ class Action:
 
     def __init__(
         self,
-        handler: Callable[
-            [Callable[[str], Any], Callable[[str, Any], None], Any], Any
-        ],
+        handler: Callable[[Callable[[str], Any], Callable[[str, Any], None], Any], Any],
     ):
         """
         Initializes the Action.

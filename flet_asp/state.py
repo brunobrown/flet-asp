@@ -42,7 +42,9 @@ class StateManager:
 
         return self._atoms[key]
 
-    def add_selector(self, key: str, select_fn: Callable[[Callable[[str], Any]], Any]) -> Selector:
+    def add_selector(
+        self, key: str, select_fn: Callable[[Callable[[str], Any]], Any]
+    ) -> Selector:
         """
         Registers a derived reactive value (Selector) from existing atoms.
 
@@ -99,7 +101,9 @@ class StateManager:
 
         self.atom(key)._set_value(value)
 
-    def bind(self, key: str, control: Ref, prop: str = "value", update: bool = True) -> None:
+    def bind(
+        self, key: str, control: Ref, prop: str = "value", update: bool = True
+    ) -> None:
         """
         Binds an Atom or Selector to a Ref (Flet UI element).
 
@@ -115,7 +119,9 @@ class StateManager:
         else:
             self.atom(key).bind(control, prop, update)
 
-    def bind_dynamic(self, key: str, control: Control | Ref, prop: str = "value", update: bool = True):
+    def bind_dynamic(
+        self, key: str, control: Control | Ref, prop: str = "value", update: bool = True
+    ):
         """
         Dynamically binds state to a Control or Ref (for flexible layouts).
 
@@ -131,7 +137,14 @@ class StateManager:
         else:
             self.atom(key).bind_dynamic(control, prop, update)
 
-    def bind_two_way(self, key: str, control: Ref, prop: str = "value", update: bool = True, on_input_change: Callable = None):
+    def bind_two_way(
+        self,
+        key: str,
+        control: Ref,
+        prop: str = "value",
+        update: bool = True,
+        on_input_change: Callable = None,
+    ):
         """
         Creates a two-way binding between Atom and a Ref input (e.g. TextField).
 
@@ -166,7 +179,9 @@ class StateManager:
         elif isinstance(target, Control) and hasattr(target, "ref"):
             atom.unbind(target.ref)
 
-    def listen(self, key: str, callback: Callable[[Any], None], immediate: bool = True) -> None:
+    def listen(
+        self, key: str, callback: Callable[[Any], None], immediate: bool = True
+    ) -> None:
         """
         Registers a listener function for a given key.
 
@@ -294,6 +309,7 @@ class StateManager:
         def decorator(func):
             self.add_selector(key, func)
             return func
+
         return decorator
 
 

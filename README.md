@@ -47,7 +47,7 @@ uv add flet-asp
 
 ---
 
-## 🧪 Example – Basic Counter
+## 🧪 Example 1 – Basic Counter
 
 ```python
 import flet as ft
@@ -76,13 +76,43 @@ if __name__ == "__main__":
 
 ```
 
+## 🧪 Example 2 – Basic counter using state alias
+
+```python
+import flet as ft
+import flet-asp as fa
+
+
+def main(page: ft.Page):
+    fa.get_state_manager(page)
+    page.state.atom("count", 0)
+
+    count_ref = ft.Ref[ft.Text]()
+
+    def increment(e):
+        page.state.set("count", page.state.get("count") + 1)
+
+    page.add(
+        ft.Text(ref=count_ref),
+        ft.ElevatedButton("Increment", on_click=increment)
+    )
+
+    page.state.bind("count", count_ref)
+
+
+if __name__ == "__main__":
+    ft.app(target=main)
+
+```
+
 ---
 
 ## 📁 Examples Included
 
 Explore the [`examples/`](./examples/) folder for full apps:
 
-- [`1_counter_atom/`](./examples/1_counter_atom.py)
+- [`1.0_counter_atom/`](./examples/1.0_counter_atom.py)
+- [`1.1_counter_atom_using_state_alias/`](./examples/1.1_counter_atom_using_state_alias.py)
 - [`2_counter_atom_bind_dynamic/`](./examples/2_counter_atom_bind_dynamic.py)
 - [`3_computed_fullname/`](./examples/3_computed_fullname.py)
 - [`4_action_login/`](./examples/4_action_login.py)

@@ -62,16 +62,16 @@ def main(page: ft.Page):
         ft.TextField(
             label="Email",
             ref=email_ref,
-            on_change=lambda e: state.set("email", e.control.value)
+            on_change=lambda e: state.set("email", e.control.value),
         ),
         ft.TextField(
             label="Password",
             password=True,
             ref=password_ref,
-            on_change=lambda e: state.set("password", e.control.value)
+            on_change=lambda e: state.set("password", e.control.value),
         ),
         ft.ElevatedButton("Login", on_click=on_login_click),
-        ft.Text(ref=welcome_ref)
+        ft.Text(ref=welcome_ref),
     )
 
     # Listen to the "user" atom and reactively update the welcome message

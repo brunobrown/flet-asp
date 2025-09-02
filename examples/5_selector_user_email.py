@@ -19,7 +19,6 @@ def main(page: ft.Page):
 
     """
 
-
     # Create the Flet-ASP state manager for this page
     state: fa.StateManager = fa.get_state_manager(page)
 
@@ -72,7 +71,7 @@ def main(page: ft.Page):
     # Listen to the selector and apply changes to the control
     user_email_selector.listen(
         callback=update_email_text,
-        immediate=False  # skip first call (optional)
+        immediate=False,  # skip first call (optional)
     )
 
     # Build the UI layout
@@ -80,18 +79,18 @@ def main(page: ft.Page):
         ft.TextField(
             label="Email",
             ref=email_input_ref,
-            on_change=lambda e: state.set("email", e.control.value)
+            on_change=lambda e: state.set("email", e.control.value),
         ),
         ft.TextField(
             label="Password",
             password=True,
             ref=pass_input_ref,
-            on_change=lambda e: state.set("password", e.control.value)
+            on_change=lambda e: state.set("password", e.control.value),
         ),
         ft.ElevatedButton("Login", on_click=on_login_click),
         ft.ProgressRing(ref=loading_ref),
         ft.Text(ref=error_ref, color="red"),
-        ft.Text(ref=email_text_ref, color="green")  # updated by Selector
+        ft.Text(ref=email_text_ref, color="green"),  # updated by Selector
     )
 
     # Bind loading and error states to controls
@@ -101,4 +100,3 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     ft.app(target=main)
-

@@ -3,6 +3,7 @@
 import pytest
 from flet_asp.state import StateManager
 
+
 def test_atom_creation_and_retrieval():
     """
     Tests if an atom can be created and its value retrieved correctly.
@@ -15,6 +16,7 @@ def test_atom_creation_and_retrieval():
     # Verifica se o valor inicial está correto
     assert manager.get("counter") == 0
     assert counter_atom.value == 0
+
 
 def test_atom_update():
     """
@@ -29,6 +31,7 @@ def test_atom_update():
     # Verifica se o valor foi atualizado
     assert manager.get("user") == "Gemini"
 
+
 def test_creating_atom_with_selector_key_raises_error():
     """
     Tests that creating an atom with a key already used by a selector raises a ValueError.
@@ -36,5 +39,7 @@ def test_creating_atom_with_selector_key_raises_error():
     manager = StateManager()
     manager.add_selector("my_selector", lambda get: "hello")
 
-    with pytest.raises(ValueError, match="Key 'my_selector' is already registered as a Selector."):
+    with pytest.raises(
+        ValueError, match="Key 'my_selector' is already registered as a Selector."
+    ):
         manager.atom("my_selector")

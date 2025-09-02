@@ -15,8 +15,8 @@ class ProductCard(ft.Card):
             subtitle=ft.Text(f"${price:.2f}"),
             trailing=ft.IconButton(
                 icon=ft.Icons.ADD_SHOPPING_CART,
-                on_click=lambda e: on_add({"name": name, "price": price})
-            )
+                on_click=lambda e: on_add({"name": name, "price": price}),
+            ),
         )
 
 
@@ -54,8 +54,7 @@ def main(page: ft.Page):
 
     # Selector instance: item count
     item_count_selector = fa.Selector(
-        resolve_atom=state.atom,
-        select_fn=lambda get: len(get("cart_items"))
+        resolve_atom=state.atom, select_fn=lambda get: len(get("cart_items"))
     )
 
     # Async Action: clear all items in the cart
@@ -74,8 +73,7 @@ def main(page: ft.Page):
         items = state.get("cart_items")
         cart_list_ref.current.controls = [
             ft.ListTile(
-                title=ft.Text(item["name"]),
-                subtitle=ft.Text(f"${item['price']:.2f}")
+                title=ft.Text(item["name"]), subtitle=ft.Text(f"${item['price']:.2f}")
             )
             for item in items
         ]
@@ -89,32 +87,33 @@ def main(page: ft.Page):
     # Page UI
     page.title = "🛒 Shopping Cart (Flet-ASP)"
     page.add(
-        ft.Column([
-            ft.Text("🛍️ Products", style=ft.TextThemeStyle.HEADLINE_SMALL),
-
-            # List of products with buttons
-            *[ProductCard(p["name"], p["price"], on_add=add_to_cart) for p in products],
-
-            ft.Divider(),
-
-            # Cart section
-            ft.Row([
-                ft.Text("Cart", style=ft.TextThemeStyle.TITLE_MEDIUM),
-                ft.Text(ref=item_count_ref)
-            ]),
-
-            ft.Column(ref=cart_list_ref),
-
-            ft.Row([
-                ft.Text("Total: "),
-                ft.Text(ref=total_text_ref)
-            ]),
-
-            ft.OutlinedButton(
-                text="Clear Cart",
-                on_click=lambda e: page.run_task(clear_cart_action.run_async, state)
-            )
-        ], width=500)
+        ft.Column(
+            [
+                ft.Text("🛍️ Products", style=ft.TextThemeStyle.HEADLINE_SMALL),
+                # List of products with buttons
+                *[
+                    ProductCard(p["name"], p["price"], on_add=add_to_cart)
+                    for p in products
+                ],
+                ft.Divider(),
+                # Cart section
+                ft.Row(
+                    [
+                        ft.Text("Cart", style=ft.TextThemeStyle.TITLE_MEDIUM),
+                        ft.Text(ref=item_count_ref),
+                    ]
+                ),
+                ft.Column(ref=cart_list_ref),
+                ft.Row([ft.Text("Total: "), ft.Text(ref=total_text_ref)]),
+                ft.OutlinedButton(
+                    text="Clear Cart",
+                    on_click=lambda e: page.run_task(
+                        clear_cart_action.run_async, state
+                    ),
+                ),
+            ],
+            width=500,
+        )
     )
 
     # Bind computed selector to UI

@@ -117,7 +117,9 @@ class Atom:
         self._listeners.append(listener)
         listener(self._value)
 
-    def bind_dynamic(self, control: Control | Ref, prop: str = "value", update: bool = True):
+    def bind_dynamic(
+        self, control: Control | Ref, prop: str = "value", update: bool = True
+    ):
         """
         Binds the atom to either a control or a Ref dynamically.
 
@@ -138,7 +140,9 @@ class Atom:
 
         for existing_listener in self._listeners:
             if is_ref:
-                if getattr(existing_listener, "__ref__", None) is getattr(target, 'ref', None):
+                if getattr(existing_listener, "__ref__", None) is getattr(
+                    target, "ref", None
+                ):
                     return
             else:
                 if getattr(existing_listener, "__control_id__", None) == id(target):
@@ -162,16 +166,24 @@ class Atom:
 
         if isinstance(target, Ref):
             self._listeners = [
-                listener for listener in self._listeners
+                listener
+                for listener in self._listeners
                 if getattr(listener, "__ref__", None) is not target
             ]
         elif isinstance(target, Control):
             self._listeners = [
-                listener for listener in self._listeners
+                listener
+                for listener in self._listeners
                 if getattr(listener, "__control_id__", None) != id(target)
             ]
 
-    def bind_two_way(self, control: Ref, prop: str = "value", update: bool = True, on_input_change: Callable = None):
+    def bind_two_way(
+        self,
+        control: Ref,
+        prop: str = "value",
+        update: bool = True,
+        on_input_change: Callable = None,
+    ):
         """
         Creates a two-way binding between the atom and an input control.
 
