@@ -111,8 +111,8 @@ if __name__ == "__main__":
 
 Explore the [`examples/`](./examples/) folder for full apps:
 
-- [`1.0_counter_atom/`](./examples/1_counter_atom.py)
-- [`1.1_counter_atom_using_state_alias/`](./examples/1_counter_atom.py)
+- [`1.0_counter_atom/`](./examples/1.0_counter_atom.py)
+- [`1.1_counter_atom_using_state_alias/`](./examples/1.1_counter_atom_using_state_alias.py)
 - [`2_counter_atom_bind_dynamic/`](./examples/2_counter_atom_bind_dynamic.py)
 - [`3_computed_fullname/`](./examples/3_computed_fullname.py)
 - [`4_action_login/`](./examples/4_action_login.py)
