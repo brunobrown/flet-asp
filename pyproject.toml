@@ -37,11 +37,8 @@ Issues = "https://github.com/brunobrown/flet-asp/issues"
 [tool.uv]
 dev-dependencies = [
     "flet[all]==0.25.2",
+    "pytest>=8.4.1",
 ]
-
-#[tool.setuptools]
-#packages = ["flet-asp"]
-#package-dir = {"" = "src"}
 
 [tool.setuptools.package-data]
 "flet_asp" = ["**/*"]
