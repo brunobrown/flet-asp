@@ -22,7 +22,9 @@ def main(page: ft.Page):
 
     # Create a Ref for the Text control
     text_number_ref = ft.Ref[ft.TextField]()
-    text_number = ft.TextField(ref=text_number_ref, text_align=ft.TextAlign.RIGHT, width=100)
+    text_number = ft.TextField(
+        ref=text_number_ref, text_align=ft.TextAlign.RIGHT, width=100
+    )
 
     # Define increment logic
     def minus_click(e):

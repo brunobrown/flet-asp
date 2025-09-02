@@ -60,23 +60,25 @@ def main(page: ft.Page):
 
     # Build the page layout
     page.add(
-        ft.Column([
-            ft.TextField(
-                label="Email",
-                ref=email_ref,
-                on_change=lambda e: state.set("email", e.control.value)
-            ),
-            ft.TextField(
-                label="Password",
-                password=True,
-                ref=password_ref,
-                on_change=lambda e: state.set("password", e.control.value)
-            ),
-            ft.ElevatedButton("Login", on_click=on_login_click),
-            ft.ProgressRing(ref=loading_ref),
-            ft.Text(ref=error_ref, color="red"),
-            ft.Text(ref=user_ref, color="green"),
-        ])
+        ft.Column(
+            [
+                ft.TextField(
+                    label="Email",
+                    ref=email_ref,
+                    on_change=lambda e: state.set("email", e.control.value),
+                ),
+                ft.TextField(
+                    label="Password",
+                    password=True,
+                    ref=password_ref,
+                    on_change=lambda e: state.set("password", e.control.value),
+                ),
+                ft.ElevatedButton("Login", on_click=on_login_click),
+                ft.ProgressRing(ref=loading_ref),
+                ft.Text(ref=error_ref, color="red"),
+                ft.Text(ref=user_ref, color="green"),
+            ]
+        )
     )
 
     # Bind state values to UI controls

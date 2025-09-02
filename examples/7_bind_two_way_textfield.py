@@ -28,13 +28,9 @@ def main(page: ft.Page):
     page.add(
         ft.TextField(ref=text_input_ref, label="Message"),
         ft.ElevatedButton(
-            "Reset",
-            on_click=lambda e: state.reset("message", "Hello, world!")
+            "Reset", on_click=lambda e: state.reset("message", "Hello, world!")
         ),
-        ft.ElevatedButton(
-            "Clear",
-            on_click=lambda e: state.reset("message", "")
-        ),
+        ft.ElevatedButton("Clear", on_click=lambda e: state.reset("message", "")),
     )
 
     # This function is called whenever the atom changes

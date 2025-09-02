@@ -65,13 +65,15 @@ def main(page: ft.Page):
         ft.TextField(
             label="Email",
             ref=email_input,
-            on_change=lambda e: state.set("email", e.control.value)
+            on_change=lambda e: state.set("email", e.control.value),
         ),
-        ft.Row([
-            ft.ElevatedButton("Login", on_click=on_login_click),
-            ft.ElevatedButton("Reset", on_click=on_reset_click),
-            ft.ElevatedButton("Logout", on_click=on_logout_click),
-        ]),
+        ft.Row(
+            [
+                ft.ElevatedButton("Login", on_click=on_login_click),
+                ft.ElevatedButton("Reset", on_click=on_reset_click),
+                ft.ElevatedButton("Logout", on_click=on_logout_click),
+            ]
+        ),
         ft.Text(ref=status_text, color="blue"),
         ft.Text(ref=user_text, color="green"),
     )

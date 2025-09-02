@@ -10,78 +10,84 @@ class TaskItem(ft.Column):
     """
 
     def __init__(
-            self,
-            task_data: dict,
-            on_toggle: Callable,
-            on_delete: Callable,
-            on_edit: Callable,
-            on_save: Callable,
+        self,
+        task_data: dict,
+        on_toggle: Callable,
+        on_delete: Callable,
+        on_edit: Callable,
+        on_save: Callable,
     ):
         super().__init__()
         self.task_data = task_data
         self.title_ref = ft.Ref[ft.TextField]()
 
         if task_data.get("editing", False):
-            self.controls = [ft.Row(
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                vertical_alignment=ft.CrossAxisAlignment.CENTER,
-                controls=[
-                    ft.TextField(
-                        ref=self.title_ref,
-                        value=task_data["title"],
-                        border=ft.InputBorder.UNDERLINE,
-                        expand=True
-                    ),
-                    ft.IconButton(
-                        icon=ft.Icons.DONE_OUTLINE_OUTLINED,
-                        icon_color=ft.Colors.GREEN,
-                        tooltip="Save task",
-                        on_click=lambda e: on_save(task_data["id"], self.title_ref.current.value)
-                    )
-                ]
-            )]
+            self.controls = [
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                    controls=[
+                        ft.TextField(
+                            ref=self.title_ref,
+                            value=task_data["title"],
+                            border=ft.InputBorder.UNDERLINE,
+                            expand=True,
+                        ),
+                        ft.IconButton(
+                            icon=ft.Icons.DONE_OUTLINE_OUTLINED,
+                            icon_color=ft.Colors.GREEN,
+                            tooltip="Save task",
+                            on_click=lambda e: on_save(
+                                task_data["id"], self.title_ref.current.value
+                            ),
+                        ),
+                    ],
+                )
+            ]
         else:
-            self.controls = [ft.Row(
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                vertical_alignment=ft.CrossAxisAlignment.CENTER,
-                controls=[
-                    ft.Checkbox(
-                        value=task_data["completed"],
-                        label=task_data["title"],
-                        on_change=lambda e: on_toggle(task_data["id"]),
-                    ),
-                    ft.Row(
-                        spacing=0,
-                        controls=[
-                            ft.IconButton(
-                                icon=ft.Icons.CREATE_OUTLINED,
-                                tooltip="Edit task",
-                                on_click=lambda e: on_edit(task_data["id"]),
-                            ),
-                            ft.IconButton(
-                                ft.Icons.DELETE_OUTLINE,
-                                tooltip="Delete task",
-                                on_click=lambda e: on_delete(task_data["id"]),
-                            ),
-                        ],
-                    ),
-                ],
-            )]
+            self.controls = [
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                    controls=[
+                        ft.Checkbox(
+                            value=task_data["completed"],
+                            label=task_data["title"],
+                            on_change=lambda e: on_toggle(task_data["id"]),
+                        ),
+                        ft.Row(
+                            spacing=0,
+                            controls=[
+                                ft.IconButton(
+                                    icon=ft.Icons.CREATE_OUTLINED,
+                                    tooltip="Edit task",
+                                    on_click=lambda e: on_edit(task_data["id"]),
+                                ),
+                                ft.IconButton(
+                                    ft.Icons.DELETE_OUTLINE,
+                                    tooltip="Delete task",
+                                    on_click=lambda e: on_delete(task_data["id"]),
+                                ),
+                            ],
+                        ),
+                    ],
+                )
+            ]
 
 
 def main(page: ft.Page):
     """
-        This example demonstrates a complete ToDo application using Flet-ASP with full reactivity. It manages tasks using:
-            * atom() for reactive task list and inputs
-            * selector() to derive the count of active tasks
-            * Action to clear completed tasks
-            * listen() to update the UI based on filter changes and task mutations
+    This example demonstrates a complete ToDo application using Flet-ASP with full reactivity. It manages tasks using:
+        * atom() for reactive task list and inputs
+        * selector() to derive the count of active tasks
+        * Action to clear completed tasks
+        * listen() to update the UI based on filter changes and task mutations
 
-        The app supports:
-            * Adding, editing, and deleting tasks
-            * Filtering by all, active, or completed
-            * Persisted updates using centralized Flet-ASP state
-        """
+    The app supports:
+        * Adding, editing, and deleting tasks
+        * Filtering by all, active, or completed
+        * Persisted updates using centralized Flet-ASP state
+    """
 
     state = fa.get_state_manager(page)
 
@@ -103,7 +109,9 @@ def main(page: ft.Page):
             return
         tasks = state.get("tasks")
         new_id = max([t["id"] for t in tasks], default=0) + 1
-        tasks.append({"id": new_id, "title": title, "completed": False, "editing": False})
+        tasks.append(
+            {"id": new_id, "title": title, "completed": False, "editing": False}
+        )
         state.set("tasks", tasks)
         state.set("new_task", "")
 
@@ -121,7 +129,7 @@ def main(page: ft.Page):
     def edit_task(task_id: int):
         tasks = state.get("tasks")
         for t in tasks:
-            t["editing"] = (t["id"] == task_id)
+            t["editing"] = t["id"] == task_id
         state.set("tasks", tasks)
 
     def save_task(task_id: int, new_title: str):
@@ -150,13 +158,8 @@ def main(page: ft.Page):
             filtered = tasks
 
         tasks_column_ref.current.controls = [
-            TaskItem(
-                t,
-                toggle_task,
-                delete_task,
-                edit_task,
-                save_task
-            ) for t in filtered
+            TaskItem(t, toggle_task, delete_task, edit_task, save_task)
+            for t in filtered
         ]
         tasks_column_ref.current.update()
 
@@ -174,37 +177,43 @@ def main(page: ft.Page):
     # UI layout
     page.title = "ToDo App (Flet-ASP)"
     page.add(
-        ft.Column([
-            ft.Text("📋 ToDo with Flet-ASP", style=ft.TextThemeStyle.HEADLINE_MEDIUM),
-            ft.Row([
-                ft.TextField(
-                    ref=input_ref,
-                    expand=True,
-                    hint_text="What needs to be done?",
-                    on_change=lambda e: state.set("new_task", e.control.value)
+        ft.Column(
+            [
+                ft.Text(
+                    "📋 ToDo with Flet-ASP", style=ft.TextThemeStyle.HEADLINE_MEDIUM
                 ),
-                ft.FloatingActionButton(icon=ft.Icons.ADD, on_click=add_task)
-            ]),
-            ft.Tabs(
-                ref=tabs_ref,
-                on_change=on_tab_change,
-                selected_index=0,
-                tabs=[
-                    ft.Tab(text="all"),
-                    ft.Tab(text="active"),
-                    ft.Tab(text="completed"),
-                ]
-            ),
-            ft.Row([
-                ft.Text("Active tasks:"),
-                ft.Text(ref=active_count_ref)
-            ]),
-            ft.Column(ref=tasks_column_ref, spacing=5),
-            ft.OutlinedButton(
-                text="Clear completed",
-                on_click=lambda e: page.run_task(clear_completed_action.run_async, state)
-            )
-        ], width=600)
+                ft.Row(
+                    [
+                        ft.TextField(
+                            ref=input_ref,
+                            expand=True,
+                            hint_text="What needs to be done?",
+                            on_change=lambda e: state.set("new_task", e.control.value),
+                        ),
+                        ft.FloatingActionButton(icon=ft.Icons.ADD, on_click=add_task),
+                    ]
+                ),
+                ft.Tabs(
+                    ref=tabs_ref,
+                    on_change=on_tab_change,
+                    selected_index=0,
+                    tabs=[
+                        ft.Tab(text="all"),
+                        ft.Tab(text="active"),
+                        ft.Tab(text="completed"),
+                    ],
+                ),
+                ft.Row([ft.Text("Active tasks:"), ft.Text(ref=active_count_ref)]),
+                ft.Column(ref=tasks_column_ref, spacing=5),
+                ft.OutlinedButton(
+                    text="Clear completed",
+                    on_click=lambda e: page.run_task(
+                        clear_completed_action.run_async, state
+                    ),
+                ),
+            ],
+            width=600,
+        )
     )
 
     # Bindings

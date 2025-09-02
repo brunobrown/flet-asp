@@ -5,8 +5,10 @@ from flet_asp.state import StateManager, get_state_manager
 # Classe simples para simular ft.Page sem dependências externas
 # pytest tests/test_state_alias.py -v
 
+
 class MockPage:
     """Mock simples para ft.Page que permite setattr/getattr"""
+
     pass
 
 
@@ -25,8 +27,9 @@ class TestStateAlias:
         manager = get_state_manager(mock_page)
 
         # Verifica se tanto _state_manager quanto state existem
-        assert hasattr(mock_page, '_state_manager')
-        assert hasattr(mock_page, 'state')
+        assert manager is not None
+        assert hasattr(mock_page, "_state_manager")
+        assert hasattr(mock_page, "state")
 
     def test_state_and_state_manager_are_same_instance(self):
         """
@@ -34,8 +37,8 @@ class TestStateAlias:
         """
         mock_page = MockPage()
 
-        # Obtém o state manager
-        manager = get_state_manager(mock_page)
+        # Chama a função que cria o state manager
+        get_state_manager(mock_page)
 
         # Verifica se são a mesma instância
         assert mock_page.state is mock_page._state_manager
@@ -117,6 +120,7 @@ class TestStateAlias:
 
         # Testa listener via alias
         callback_called = []
+
         def on_name_change(value):
             callback_called.append(value)
 
@@ -153,10 +157,23 @@ class TestStateAlias:
 
         # Lista de métodos que devem estar disponíveis via alias
         expected_methods = [
-            'atom', 'get', 'set', 'has', 'reset', 'delete', 'clear',
-            'listen', 'unlisten', 'bind', 'unbind', 'add_selector',
-            'selector', 'invalidate', 'listen_multiple', 'bind_dynamic',
-            'bind_two_way'
+            "atom",
+            "get",
+            "set",
+            "has",
+            "reset",
+            "delete",
+            "clear",
+            "listen",
+            "unlisten",
+            "bind",
+            "unbind",
+            "add_selector",
+            "selector",
+            "invalidate",
+            "listen_multiple",
+            "bind_dynamic",
+            "bind_two_way",
         ]
 
         for method_name in expected_methods:
@@ -174,7 +191,9 @@ class TestStateAlias:
         mock_page.state.add_selector("test_selector", lambda get: "computed")
 
         # Tenta criar átomo com mesmo nome - deve dar erro
-        with pytest.raises(ValueError, match="Key 'test_selector' is already registered as a Selector"):
+        with pytest.raises(
+            ValueError, match="Key 'test_selector' is already registered as a Selector"
+        ):
             mock_page.state.atom("test_selector")
 
 
@@ -260,11 +279,7 @@ class TestStateAliasIntegration:
         get_state_manager(mock_page)
 
         # Estado do formulário
-        mock_page.state.atom("form_data", default={
-            "name": "",
-            "email": "",
-            "age": 0
-        })
+        mock_page.state.atom("form_data", default={"name": "", "email": "", "age": 0})
         mock_page.state.atom("form_errors", default={})
         mock_page.state.atom("form_loading", default=False)
 
@@ -272,21 +287,15 @@ class TestStateAliasIntegration:
         @mock_page.state.selector("form_is_valid")
         def form_is_valid(get):
             data = get("form_data")
-            return (
-                len(data["name"]) > 0 and
-                "@" in data["email"] and
-                data["age"] > 0
-            )
+            return len(data["name"]) > 0 and "@" in data["email"] and data["age"] > 0
 
         # Estado inicial
         assert not mock_page.state.get("form_is_valid")
 
         # Preenche formulário
-        mock_page.state.set("form_data", {
-            "name": "João Silva",
-            "email": "joao@email.com",
-            "age": 30
-        })
+        mock_page.state.set(
+            "form_data", {"name": "João Silva", "email": "joao@email.com", "age": 30}
+        )
 
         # Agora deve ser válido
         assert mock_page.state.get("form_is_valid")
@@ -311,10 +320,10 @@ class TestStateAliasEdgeCases:
         mock_page.state = "existing_value"
 
         # Chama get_state_manager
-        manager = get_state_manager(mock_page)
+        get_state_manager(mock_page)
 
         # O alias deve sobrescrever o valor existente
-        assert mock_page.state is not "existing_value"
+        assert mock_page.state is not "existing_value"  # noqa
         assert mock_page.state is mock_page._state_manager
         assert isinstance(mock_page.state, StateManager)
 
@@ -322,6 +331,7 @@ class TestStateAliasEdgeCases:
         """
         Testa se os métodos da página continuam funcionando após adicionar o alias.
         """
+
         class PageWithMethods(MockPage):
             def custom_method(self):
                 return "page_method_result"
@@ -333,7 +343,7 @@ class TestStateAliasEdgeCases:
         assert mock_page.custom_method() == "page_method_result"
 
         # Alias state também deve funcionar
-        assert hasattr(mock_page, 'state')
+        assert hasattr(mock_page, "state")
         assert isinstance(mock_page.state, StateManager)
 
     def test_state_manager_functionality_not_affected(self):
@@ -348,6 +358,7 @@ class TestStateAliasEdgeCases:
 
         # Listen com callback
         results = []
+
         def callback(value):
             results.append(value)
 

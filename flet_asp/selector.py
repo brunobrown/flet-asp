@@ -19,7 +19,7 @@ class Selector(Atom):
     def __init__(
         self,
         select_fn: Callable[[Callable[[str], Any]], Any],
-        resolve_atom: Callable[[str], Atom]
+        resolve_atom: Callable[[str], Atom],
     ):
         """
         Initializes the Selector.
@@ -37,7 +37,9 @@ class Selector(Atom):
         self._setup_dependencies()
 
     def __repr__(self):
-        return f"<Selector(dependencies={list(self._dependencies)}, value={self._value})>"
+        return (
+            f"<Selector(dependencies={list(self._dependencies)}, value={self._value})>"
+        )
 
     def _setup_dependencies(self):
         """
