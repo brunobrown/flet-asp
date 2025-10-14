@@ -51,7 +51,7 @@ uv add flet-asp
 
 ```python
 import flet as ft
-import flet-asp as fa
+import flet_asp as fa
 
 
 def main(page: ft.Page):
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
 ```python
 import flet as ft
-import flet-asp as fa
+import flet_asp as fa
 
 
 def main(page: ft.Page):
