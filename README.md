@@ -33,13 +33,13 @@ uv add flet-asp
 
 ## ✨ Key Features
 
-✅ **Reactive atoms** - Automatic UI updates when state changes
-✅ **Selectors** - Derived/computed state (sync & async)
-✅ **Actions** - Async-safe workflows for API calls, auth, etc.
-✅ **One-way & two-way binding** - Seamless form input synchronization
-✅ **Hybrid update strategy** - Bindings work even before controls are mounted
-✅ **Python 3.14+ optimizations** - Free-threading, incremental GC, 3-5% faster
-✅ **Lightweight** - No dependencies beyond Flet
+✅ **Reactive atoms** - Automatic UI updates when state changes  
+✅ **Selectors** - Derived/computed state (sync & async)  
+✅ **Actions** - Async-safe workflows for API calls, auth, etc.  
+✅ **One-way & two-way binding** - Seamless form input synchronization  
+✅ **Hybrid update strategy** - Bindings work even before controls are mounted  
+✅ **Python 3.14+ optimizations** - Free-threading, incremental GC, 3-5% faster  
+✅ **Lightweight** - No dependencies beyond Flet  
 ✅ **Type-safe** - Full type hints support
 
 ---
@@ -236,8 +236,10 @@ def main(page: ft.Page):
     async def handle_login(e):
         await login.run_async(
             page.state,
-            email=email_field.current.value,
-            password=password_field.current.value
+            {
+                "email": email_field.current.value,
+                "password": password_field.current.value
+            }
         )
 
         user = page.state.get("user")
@@ -572,6 +574,7 @@ def main(page: ft.Page):
     page.state.atom("user_id", 1)
 
     # Async selector - fetches user data
+    @page.state.selector("user_data")
     async def fetch_user(get):
         user_id = get("user_id")
 
@@ -587,12 +590,15 @@ def main(page: ft.Page):
 
         return users.get(user_id, {"name": "Unknown", "email": "N/A"})
 
-    user_selector = fa.Selector(fetch_user, page.state, is_async=True)
-
     # UI
     user_info = ft.Ref[ft.Text]()
 
     def update_user_info(user_data):
+        # Async selectors may return coroutines on first call, check the type
+        import inspect
+        if inspect.iscoroutine(user_data):
+            # Skip coroutine objects - they will be resolved automatically
+            return
         if user_data:
             user_info.current.value = f"{user_data['name']} ({user_data['email']})"
         else:
@@ -603,7 +609,8 @@ def main(page: ft.Page):
         current_id = page.state.get("user_id")
         page.state.set("user_id", (current_id % 3) + 1)
 
-    user_selector.listen(update_user_info)
+    # Listen to selector changes
+    page.state.listen("user_data", update_user_info)
 
     page.add(
         ft.Column([
@@ -786,9 +793,8 @@ Explore the [`examples/`](./examples/) folder for complete applications:
 ---
 
 ## 🧩 Building Design Systems with Atomic Design
-
 <p align="center">
-  <img src="./examples/img.jpeg" alt="Atomic Design System" width="70%">
+    <img src="https://github.com/user-attachments/assets/2d31c317-8b76-4d4d-8d9b-ab64da600ddd" alt="Atomic Design System" width="100%">
 </p>
 
 **Flet-ASP** is designed from the ground up to work seamlessly with the **Atomic Design methodology** - a powerful approach for building scalable, maintainable design systems.
@@ -966,5 +972,4 @@ For feedback, [open an issue](https://github.com/brunobrown/flet-asp/issues) wit
 ---
 
 <p align="center"><img src="https://github.com/user-attachments/assets/431aa05f-5fbc-4daa-9689-b9723583e25a" width="50%"></p>
-
-> [Commit your work to the LORD, and your plans will succeed. Proverbs 16:3](https://www.bible.com/bible/116/PRO.16.NLT)
+<p align="center"><a href="https://www.bible.com/bible/116/PRO.16.NLT"> Commit your work to the LORD, and your plans will succeed. Proverbs 16:3</a></p>
