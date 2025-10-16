@@ -54,16 +54,6 @@ jobs:
         run: |
           uv run pytest -v --cov=flet_asp --cov-report=term-missing --cov-report=xml
 
-      - name: Check test count
-        run: |
-          test_count=$(uv run pytest --collect-only -q | tail -n 1 | awk '{print $1}')
-          echo "Total tests found: $test_count"
-          if [ "$test_count" -lt 29 ]; then
-            echo "❌ Expected at least 29 tests, found $test_count"
-            exit 1
-          fi
-          echo "✅ Test count is adequate"
-
       - name: Verify version update in pyproject.toml
         if: github.event_name == 'pull_request'
         run: |

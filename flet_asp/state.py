@@ -86,11 +86,27 @@ class StateManager:
 
         return self._atoms[key]
 
+    def _resolve_atom_or_selector(self, key: str) -> Atom:
+        """
+        Internal method to resolve both atoms and selectors.
+
+        This allows selectors to depend on other selectors, not just atoms.
+
+        Args:
+            key (str): The key to resolve.
+
+        Returns:
+            Atom: The atom or selector (which inherits from Atom).
+        """
+        if key in self._selectors:
+            return self._selectors[key]
+        return self.atom(key)
+
     def add_selector(
         self, key: str, select_fn: Callable[[Callable[[str], Any]], Any]
     ) -> Selector:
         """
-        Registers a derived reactive value (Selector) from existing atoms.
+        Registers a derived reactive value (Selector) from existing atoms or other selectors.
 
         Args:
             key (str): Unique key for the selector.
@@ -104,7 +120,7 @@ class StateManager:
             raise ValueError(f"Key '{key}' is already registered as an Atom.")
 
         if key not in self._selectors:
-            self._selectors[key] = Selector(select_fn, self.atom)
+            self._selectors[key] = Selector(select_fn, self._resolve_atom_or_selector)
 
         return self._selectors[key]
 
