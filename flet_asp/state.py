@@ -13,14 +13,58 @@ class StateManager:
     Each key represents an isolated Atom or derived Selector. Useful for building
     modular and predictable UI state.
 
+    Features:
+        - Automatic flush of pending updates after page.update()
+        - Hybrid update strategy for reliable bindings
+        - Python 3.14+ optimizations (free-threading, incremental GC)
+
     Attributes:
-        _atoms (dict[str, Atom]): All registered atom states.
-        _selectors (dict[str, Selector]): All registered computed selectors.
+        _atoms (Dict[str, Atom]): All registered atom states.
+        _selectors (Dict[str, Selector]): All registered computed selectors.
+        _page (Optional[Page]): Reference to the Flet page (if provided).
     """
 
-    def __init__(self):
+    def __init__(self, page: Optional[Page] = None):
         self._atoms: Dict[str, Atom] = {}
         self._selectors: Dict[str, Selector] = {}
+        self._page: Optional[Page] = page
+
+        # Hook page.update() to flush pending updates automatically
+        if page:
+            self._hook_page_update(page)
+
+    def _hook_page_update(self, page: Page) -> None:
+        """
+        Hooks into page.update() to automatically flush pending atom updates.
+
+        This ensures that any controls that were bound before being added to the page
+        will be updated as soon as page.update() is called.
+
+        Args:
+            page (Page): The Flet page to hook.
+        """
+        # Only hook if page has update method (defensive programming for tests/mocks)
+        if not hasattr(page, "update") or not callable(getattr(page, "update", None)):
+            return
+
+        original_update = page.update
+
+        def wrapped_update(*args, **kwargs):
+            # Call original page.update()
+            result = original_update(*args, **kwargs)
+
+            # Flush all pending updates from all atoms
+            for atom in self._atoms.values():
+                atom._flush_pending_updates()
+
+            # Selectors inherit from Atom, so flush them too
+            for selector in self._selectors.values():
+                selector._flush_pending_updates()
+
+            return result
+
+        # Replace page.update with wrapped version
+        page.update = wrapped_update
 
     def atom(self, key: str, default: Optional[Any] = None) -> Atom:
         """
@@ -42,11 +86,27 @@ class StateManager:
 
         return self._atoms[key]
 
+    def _resolve_atom_or_selector(self, key: str) -> Atom:
+        """
+        Internal method to resolve both atoms and selectors.
+
+        This allows selectors to depend on other selectors, not just atoms.
+
+        Args:
+            key (str): The key to resolve.
+
+        Returns:
+            Atom: The atom or selector (which inherits from Atom).
+        """
+        if key in self._selectors:
+            return self._selectors[key]
+        return self.atom(key)
+
     def add_selector(
         self, key: str, select_fn: Callable[[Callable[[str], Any]], Any]
     ) -> Selector:
         """
-        Registers a derived reactive value (Selector) from existing atoms.
+        Registers a derived reactive value (Selector) from existing atoms or other selectors.
 
         Args:
             key (str): Unique key for the selector.
@@ -60,7 +120,7 @@ class StateManager:
             raise ValueError(f"Key '{key}' is already registered as an Atom.")
 
         if key not in self._selectors:
-            self._selectors[key] = Selector(select_fn, self.atom)
+            self._selectors[key] = Selector(select_fn, self._resolve_atom_or_selector)
 
         return self._selectors[key]
 
@@ -315,16 +375,28 @@ class StateManager:
 
 def get_state_manager(page: Page) -> StateManager:
     """
-    Returns a page-scoped singleton instance of StateManager.
+    Returns a page-scoped singleton instance of StateManager with automatic flush support.
+
+    This function creates a StateManager bound to the page and hooks into page.update()
+    to automatically process pending control updates from the hybrid binding strategy.
 
     Args:
         page (Page): Flet page context.
 
     Returns:
-        StateManager: Unique manager instance for the page.
+        StateManager: Unique manager instance for the page with automatic flush enabled.
+
+    Example:
+        >>> import flet as ft
+        >>> import flet_asp as fa
+        >>>
+        >>> def main(page: ft.Page):
+        >>>     state = fa.get_state_manager(page)
+        >>>     state.atom("count", 0)
+        >>>     # Now bindings will work even if controls aren't added yet!
     """
     if not hasattr(page, "_state_manager"):
-        manager = StateManager()
+        manager = StateManager(page)  # Pass page for automatic flush
         setattr(page, "_state_manager", manager)
         setattr(page, "state", manager)
 
