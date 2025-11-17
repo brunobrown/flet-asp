@@ -584,7 +584,46 @@ class Atom:
             new_value = getattr(control.current, prop)
             self._set_value(new_value)
 
-        control.current.on_change = on_input_change or on_change
+        def setup_on_change():
+            """Setup the on_change handler - handles both common and uncommon cases"""
+            if control.current is None:
+                return False  # Not ready yet
+
+            # Wrap existing on_change if it exists
+            existing_handler = getattr(control.current, 'on_change', None)
+
+            def wrapped_handler(e):
+                # Call our handler first
+                (on_input_change or on_change)(e)
+                # Then call existing handler if it exists
+                if existing_handler and callable(existing_handler):
+                    existing_handler(e)
+
+            control.current.on_change = wrapped_handler
+
+            # CRITICAL: Call update() to sync the on_change handler with Flet's backend
+            if hasattr(control.current, 'page') and control.current.page:
+                try:
+                    control.current.update()
+                except:
+                    pass  # Ignore update errors
+
+            return True  # Success!
+
+        # Try to setup immediately (common case)
+        if not setup_on_change():
+            # Uncommon case: control not ready, use polling
+            import threading
+            import time
+
+            def poll_and_setup():
+                for attempt in range(100):  # 100ms max
+                    time.sleep(0.001)  # 1ms
+                    if setup_on_change():
+                        return  # Success
+                # If we reach here, setup failed - silently ignore
+
+            threading.Thread(target=poll_and_setup, daemon=True).start()
 
     def clear_listeners(self) -> None:
         """

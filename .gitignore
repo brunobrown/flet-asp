@@ -214,3 +214,5 @@ __marimo__/
 
 # Validate README
 validate_readme.py
+
+examples/storage
