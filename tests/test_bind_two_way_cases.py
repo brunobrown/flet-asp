@@ -5,6 +5,7 @@ Tests cover:
 1. Common case: bind_two_way() called AFTER page.add()
 2. Uncommon case: bind_two_way() called BEFORE page.add()
 """
+
 import flet as ft
 import flet_asp as fa
 import time
@@ -21,7 +22,7 @@ class MockPage:
         """Simulate page.add()"""
         self.added_controls.extend(controls)
         for control in controls:
-            if hasattr(control, 'ref') and control.ref is not None:
+            if hasattr(control, "ref") and control.ref is not None:
                 control.ref.current = control
                 # Simulate page assignment
                 control.page = self
@@ -80,12 +81,14 @@ def test_bind_two_way_common_case():
     email_ref.current.on_change(FakeEvent("test@example.com"))
 
     # Verify atom was updated
-    assert state.get("email") == "test@example.com", \
+    assert state.get("email") == "test@example.com", (
         f"Expected 'test@example.com', got '{state.get('email')}'"
+    )
 
     # Verify listener was called
-    assert "test@example.com" in listener_calls, \
+    assert "test@example.com" in listener_calls, (
         f"Listener should be called with 'test@example.com', got {listener_calls}"
+    )
 
     print("✅ Common case test passed!")
 
@@ -129,8 +132,9 @@ def test_bind_two_way_uncommon_case():
     assert email_ref.current is not None, "Control should exist after page.add"
 
     # Verify on_change was set by the polling mechanism
-    assert email_ref.current.on_change is not None, \
+    assert email_ref.current.on_change is not None, (
         "on_change should be set even in uncommon case"
+    )
 
     # Simulate user typing
     class FakeEvent:
@@ -142,12 +146,14 @@ def test_bind_two_way_uncommon_case():
     email_ref.current.on_change(FakeEvent("uncommon@test.com"))
 
     # Verify atom was updated
-    assert state.get("email") == "uncommon@test.com", \
+    assert state.get("email") == "uncommon@test.com", (
         f"Expected 'uncommon@test.com', got '{state.get('email')}'"
+    )
 
     # Verify listener was called
-    assert "uncommon@test.com" in listener_calls, \
+    assert "uncommon@test.com" in listener_calls, (
         f"Listener should be called, got {listener_calls}"
+    )
 
     print("✅ Uncommon case test passed!")
 
@@ -281,10 +287,12 @@ if __name__ == "__main__":
     except AssertionError as e:
         print(f"\n❌ TEST FAILED: {e}")
         import traceback
+
         traceback.print_exc()
         exit(1)
     except Exception as e:
         print(f"\n❌ ERROR: {e}")
         import traceback
+
         traceback.print_exc()
         exit(1)

@@ -590,7 +590,7 @@ class Atom:
                 return False  # Not ready yet
 
             # Wrap existing on_change if it exists
-            existing_handler = getattr(control.current, 'on_change', None)
+            existing_handler = getattr(control.current, "on_change", None)
 
             def wrapped_handler(e):
                 # Call our handler first
@@ -602,10 +602,10 @@ class Atom:
             control.current.on_change = wrapped_handler
 
             # CRITICAL: Call update() to sync the on_change handler with Flet's backend
-            if hasattr(control.current, 'page') and control.current.page:
+            if hasattr(control.current, "page") and control.current.page:
                 try:
                     control.current.update()
-                except:
+                except Exception:
                     pass  # Ignore update errors
 
             return True  # Success!

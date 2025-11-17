@@ -1,6 +1,7 @@
 """
 Test to understand how Flet handles on_change
 """
+
 import flet as ft
 
 

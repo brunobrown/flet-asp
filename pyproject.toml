@@ -34,6 +34,10 @@ Homepage = "https://github.com/brunobrown/flet-asp"
 Repository = "https://github.com/brunobrown/flet-asp"
 Issues = "https://github.com/brunobrown/flet-asp/issues"
 
+[tool.ruff]
+output-format = "concise"
+extend-exclude = ["__pycache__"]
+
 [dependency-groups]
 dev = [
     "flet[all]==0.25.2",
