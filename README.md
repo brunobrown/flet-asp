@@ -1,6 +1,21 @@
 <p align="center"><img src="https://github.com/user-attachments/assets/84c2835b-9356-42ae-8a78-7c3ac11679c1" width="25%" alt="flet-asp"></p>
 <h1 align="center"> Flet ASP - Flet Atomic State Pattern</h1>
 
+<p align="center">
+<a href="https://github.com/brunobrown/flet-asp/actions?query=workflow%3AMain+event%3Apush+branch%3Amain" target="_blank">
+    <img src="https://github.com/brunobrown/flet-asp/actions/workflows/main.yml/badge.svg?event=push&branch=main" alt="Main">
+</a>
+<a href="https://github.com/brunobrown/flet-asp/actions?query=workflow%3ADev+event%3Apush+branch%3ADev" target="_blank">
+    <img src="https://github.com/brunobrown/flet-asp/actions/workflows/dev.yml/badge.svg?event=push&branch=dev" alt="Dev">
+</a>
+<a href="https://pypi.org/project/flet-asp" target="_blank">
+    <img src="https://img.shields.io/pypi/v/flet-asp?color=%2334D058&label=pypi%20package" alt="Package version">
+</a>
+<a href="https://pypi.org/project/flet-asp" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/flet-asp.svg?color=%2334D058" alt="Supported Python versions">
+</a>
+<a href="https://pepy.tech/projects/flet-asp"><img src="https://static.pepy.tech/personalized-badge/flet-asp?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=BRIGHTGREEN&left_text=Downloads" alt="PyPI Downloads"></a>
+
 ---
 
 ## 📖 Overview
