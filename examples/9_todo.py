@@ -169,10 +169,9 @@ def main(page: ft.Page):
         return len([t for t in get("tasks") if not t["completed"]])
 
     # Action: clear completed tasks
-    async def clear_completed(get, set_value, _):
-        set_value("tasks", [t for t in get("tasks") if not t["completed"]])
-
-    clear_completed_action = fa.Action(clear_completed)
+    @state.action
+    async def clear_completed(get, set):
+        set("tasks", [t for t in get("tasks") if not t["completed"]])
 
     # UI layout
     page.title = "ToDo App (Flet-ASP)"
@@ -207,9 +206,7 @@ def main(page: ft.Page):
                 ft.Column(ref=tasks_column_ref, spacing=5),
                 ft.OutlinedButton(
                     text="Clear completed",
-                    on_click=lambda e: page.run_task(
-                        clear_completed_action.run_async, state
-                    ),
+                    on_click=lambda e: page.run_task(clear_completed),
                 ),
             ],
             width=600,
