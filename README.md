@@ -288,6 +288,381 @@ ft.app(target=main)
 
 ---
 
+## 🤔 Listen, Selector, and Action: When to use each one?
+
+Flet-ASP provides three powerful tools for managing reactive state. Understanding when to use each one is key to writing clean, performant code.
+
+### 📊 Quick Comparison
+
+| Feature | `listen()` | `selector()` | `action()` |
+|---------|-----------|--------------|------------|
+| **Purpose** | Execute **side effects** | Calculate **derived state** | Execute **business logic** |
+| **Returns value?** | ❌ No | ✅ Yes (creates atom) | ❌ No |
+| **Execution** | 🔄 Automatic (reactive) | 🔄 Automatic (reactive) | 👆 Manual (on-demand) |
+| **Tracks dependencies** | ❌ No (1 atom only) | ✅ Yes (automatic) | ❌ No |
+| **Memoization** | ❌ No | ✅ Yes (5-20x faster) | ❌ No |
+| **Can modify state** | ✅ Yes (via `state.set()`) | ❌ No (read-only) | ✅ Yes (via `set()`) |
+
+### 📖 `listen()` - For Side Effects
+
+Use `listen()` when you need to **react** to state changes with side effects (operations that don't produce state).
+
+**Common use cases:**
+- Logging/debugging state changes
+- Sending analytics events
+- Syncing with localStorage or databases
+- Showing notifications
+- Making API calls when state changes
+
+**Example:**
+```python
+# Listen to user login to track analytics
+page.state.listen("user", lambda user: send_analytics({
+    "event": "user_login",
+    "user_id": user["id"] if user else None
+}))
+
+# Debug state changes
+page.state.listen("count", lambda value: print(f"Count changed: {value}"))
+```
+
+**Key characteristics:**
+- Listens to **ONE** atom at a time
+- Does **NOT** create new state
+- Executes immediately when the atom changes
+
+---
+
+### 🔄 `selector()` - For Derived State
+
+Use `selector()` when you need to **compute a value** based on other atoms.
+
+**Common use cases:**
+- Form validation (checking multiple fields)
+- Calculations (totals, averages, conversions)
+- Filtering/mapping lists
+- Formatting data (combining first + last name)
+- Combining multiple atoms into one value
+
+**Example:**
+```python
+# Validate form - automatically recalculates when email OR password changes
+@page.state.selector("form_valid")
+def validate_form(get):
+    email = get("email")
+    password = get("password")
+    return bool(email and password and "@" in email and len(password) >= 6)
+
+# Calculate cart total - recomputes when items change
+@page.state.selector("cart_total")
+def calculate_total(get):
+    items = get("cart_items")
+    return sum(item["price"] * item["quantity"] for item in items)
+```
+
+**Key characteristics:**
+- Tracks **ALL** dependencies automatically
+- **Creates a new atom** with the computed value
+- **Memoized** - only recalculates when dependencies change
+- 5-20x faster than manual listeners for derivations
+
+**Why it's better than `listen()`:**
+
+```python
+# ❌ With listen() - verbose, manual, no cache
+def update_total(value):
+    items = state.get("cart_items")
+    tax = state.get("tax_rate")
+    total = sum(i["price"] for i in items) * (1 + tax)
+    state.set("total", total)
+
+page.state.listen("cart_items", update_total)
+page.state.listen("tax_rate", update_total)  # Duplicate code!
+
+# ✅ With selector() - clean, automatic, cached
+@page.state.selector("total")
+def calculate_total(get):
+    items = get("cart_items")
+    tax = get("tax_rate")
+    return sum(i["price"] for i in items) * (1 + tax)
+```
+
+---
+
+### ⚡ `action()` - For Business Logic
+
+Use `action()` when you need to **execute complex operations** that read and/or modify multiple atoms.
+
+**Common use cases:**
+- Login/authentication workflows
+- Saving forms (validation + API call + state updates)
+- Checkout process (multiple state changes)
+- Resetting application state
+- Complex multi-step operations
+
+**Two ways to use:**
+
+#### **Decorator style** (recommended):
+```python
+@page.state.action
+def submit_form(get, set):
+    # Read state
+    email = get("email")
+    password = get("password")
+
+    # Validation
+    if not email or not password:
+        set("error", "Fill all fields")
+        return
+
+    # Update multiple atoms
+    set("loading", True)
+    set("error", None)
+
+    # Business logic
+    result = authenticate(email, password)
+
+    if result.success:
+        set("user", result.user)
+        set("logged_in", True)
+    else:
+        set("error", result.message)
+
+    set("loading", False)
+
+# Call it manually
+on_click=lambda _: submit_form()
+```
+
+#### **Direct instantiation** (advanced):
+```python
+def submit_form_fn(get, set, args):
+    email = get("email")
+    # ... same logic ...
+
+submit_form = fa.Action(submit_form_fn)
+
+# Call with state
+on_click=lambda _: submit_form.run(page.state)
+
+# Or async
+await submit_form.run_async(page.state, args={"extra": "data"})
+```
+
+**Key characteristics:**
+- Called **manually** (not reactive)
+- Can **read and modify** multiple atoms
+- Supports **sync and async** operations
+- Perfect for organizing complex workflows
+
+---
+
+### 🎯 Decision Tree: Which One To Use?
+
+```
+┌─────────────────────────────────────────┐
+│ Do you need to COMPUTE a new value      │
+│ from existing atoms?                    │
+└────────────┬────────────────────────────┘
+             │
+        Yes  │  No
+             ▼
+    ┌────────────────┐
+    │ Use selector() │ ← Automatically creates derived state
+    └────────────────┘
+             │
+             │
+        No   │
+             ▼
+┌─────────────────────────────────────────┐
+│ Do you need to REACT automatically      │
+│ when a single atom changes?             │
+└────────────┬────────────────────────────┘
+             │
+        Yes  │  No
+             ▼
+    ┌────────────────┐
+    │ Use listen()   │ ← For side effects (logs, analytics, etc)
+    └────────────────┘
+             │
+             │
+        No   │
+             ▼
+┌─────────────────────────────────────────┐
+│ Do you need to execute complex logic    │
+│ that modifies multiple atoms?           │
+└────────────┬────────────────────────────┘
+             │
+        Yes  │
+             ▼
+    ┌────────────────┐
+    │ Use action()   │ ← For business logic, workflows
+    └────────────────┘
+```
+
+---
+
+### 💡 Combining All Three
+
+Here's a real-world example using all three together:
+
+```python
+import flet as ft
+import flet_asp as fa
+
+
+class AuthResult:
+    def __init__(self, success, user=None, message=None):
+        self.success = success
+        self.user = user
+        self.message = message
+
+
+def authenticate(email, password):
+    import time
+    time.sleep(2)  # Simulates API delay
+    return AuthResult(
+        success=True,
+        user={
+            "id": 1,
+            "name": email
+        }
+    )
+
+
+def send_analytics(param):
+    print(param)
+
+
+def main(page: ft.Page):
+    state = fa.get_state_manager(page)
+
+    # Atoms - raw data
+    state.atom("email", "")
+    state.atom("password", "")
+    state.atom("user", None)
+    state.atom("loading", False)
+
+    # Selector - derived state (form validation)
+    @state.selector("form_valid")
+    def validate_form(get):
+        """Automatically recalculates when email or password changes"""
+        email = get("email")
+        password = get("password")
+
+        if not email or not password:
+            return False
+
+        if "@" in get("email"):
+            return True
+
+        return False
+
+    # Listen - side effect (analytics)
+    state.listen("user", lambda user: send_analytics({
+        "event": "login",
+        "user_id": user["id"] if user else None
+    }))
+
+    # Listen - reset user when fields are cleared
+    def reset_user_on_clear(value):
+        # If email or password is cleared, reset user
+        email = state.get("email")
+        password = state.get("password")
+        if (not email or not password) and state.get("user"):
+            state.set("user", None)
+
+    state.listen("email", reset_user_on_clear)
+    state.listen("password", reset_user_on_clear)
+
+    # Action - business logic (login workflow)
+    @state.action
+    def login(get, set):
+        """Executes when user clicks login button"""
+        set("loading", True)
+
+        email = get("email")
+        password = get("password")
+
+        # Call API
+        result = authenticate(email, password)
+
+        if result.success:
+            set("user", result.user)  # ← This triggers the listen() above!
+        else:
+            set("error", result.message)
+
+        set("loading", False)
+
+    # UI
+    email_ref = ft.Ref[ft.TextField]()
+    password_ref = ft.Ref[ft.TextField]()
+    login_btn = ft.Ref[ft.ElevatedButton]()
+    loading_spinner = ft.Ref[ft.ProgressRing]()
+    status_text = ft.Ref[ft.Text]()
+
+    page.add(
+        ft.Column([
+            ft.Text("Login Form", size=24, weight=ft.FontWeight.BOLD),
+            ft.Divider(),
+            ft.TextField(ref=email_ref, label="Email"),
+            ft.TextField(ref=password_ref, label="Password", password=True),
+            ft.ElevatedButton(
+                ref=login_btn,
+                text="Login",
+                on_click=lambda _: login(),  # ← Calls action manually
+                visible=False  # ← Controlled by selector
+            ),
+            ft.Row([
+                ft.ProgressRing(ref=loading_spinner, visible=False, width=20, height=20),
+                ft.Text(ref=status_text, color=ft.Colors.GREEN, size=16)
+            ])
+        ])
+    )
+
+    # Selector to create the status message (derived from the user)
+    @state.selector("status_message")
+    def get_status_message(get):
+        user = get("user")
+        if user:
+            return f"Welcome, {user['name']}!"
+        return ""
+
+    # Bindings
+    state.bind_two_way("email", email_ref)
+    state.bind_two_way("password", password_ref)
+    state.bind("form_valid", login_btn, prop="visible")  # ← Selector binding
+    state.bind("loading", loading_spinner, prop="visible")  # ← Loading spinner
+    state.bind("status_message", status_text, prop="value")  # ← Status message (selector)
+
+
+ft.app(target=main)
+```
+
+**What's happening:**
+1. **Selector** validates the form and creates the status message automatically
+2. **Binding** shows/hides button based on validation
+3. **Action** handles login when button is clicked
+4. **Listen** sends analytics when user state changes
+
+---
+
+### 📚 Best Practices
+
+**✅ DO:**
+- Use `selector()` for any derived/computed state
+- Use `listen()` for side effects (logs, analytics, storage sync)
+- Use `action()` for complex workflows with multiple state changes
+- Combine all three when appropriate
+
+**❌ DON'T:**
+- Don't use `listen()` to create derived state (use `selector()` instead)
+- Don't use `action()` for simple one-line state updates
+- Don't duplicate listeners when a selector can track dependencies automatically
+- Don't forget that selectors are memoized (much faster!)
+
+---
+
 ## 📚 Advanced Usage
 
 ### Custom Controls with Reactive State

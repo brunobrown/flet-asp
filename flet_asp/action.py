@@ -1,5 +1,7 @@
-from typing import Any, Callable
-from flet_asp.state import StateManager
+from typing import Any, Callable, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from flet_asp.state import StateManager
 
 
 class Action:
@@ -35,7 +37,7 @@ class Action:
 
         self.handler = handler
 
-    def run(self, state: StateManager, args: Any = None):
+    def run(self, state: "StateManager", args: Any = None):
         """
         Executes the action synchronously.
 
@@ -52,7 +54,7 @@ class Action:
 
         return self.handler(get, set_value, args)
 
-    async def run_async(self, state: StateManager, args: Any = None):
+    async def run_async(self, state: "StateManager", args: Any = None):
         """
         Executes the action asynchronously.
 

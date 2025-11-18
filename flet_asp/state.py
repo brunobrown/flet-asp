@@ -1,9 +1,9 @@
 from flet import Page, Control
 from typing import Any, Callable, Dict, Optional
 from flet.core.ref import Ref
-
 from flet_asp.atom import Atom
 from flet_asp.selector import Selector
+from flet_asp.action import Action
 
 
 class StateManager:
@@ -371,6 +371,61 @@ class StateManager:
             return func
 
         return decorator
+
+    def action(self, func: Callable):
+        """
+        Decorator for creating actions that can read and modify state.
+
+        Actions are useful for encapsulating business logic, validations,
+        and operations that need to modify multiple atoms.
+
+        Example:
+            @state.action
+            def submit_form(get, set):
+                email = get("email")
+                password = get("password")
+
+                if not email or not password:
+                    set("error", "Fill all fields")
+                    return
+
+                set("loading", True)
+                # ... API call ...
+                set("loading", False)
+                set("success", True)
+
+        Args:
+            func (Callable): Function with signature (get, set) -> Any
+
+        Returns:
+            Callable: Wrapped function that executes the action
+        """
+        import asyncio
+
+        # Check if the function is async
+        if asyncio.iscoroutinefunction(func):
+
+            async def async_wrapper(*args, **kwargs):
+                # Create an Action instance with an async handler
+                async def async_handler(get, set, _):
+                    return await func(get, set, *args, **kwargs)
+
+                action_instance = Action(async_handler)
+                # Execute the action asynchronously with this state manager
+                return await action_instance.run_async(self)
+
+            return async_wrapper
+        else:
+
+            def wrapper(*args, **kwargs):
+                # Create an Action instance
+                action_instance = Action(
+                    lambda get, set, _: func(get, set, *args, **kwargs)
+                )
+                # Execute the action with this state manager
+                return action_instance.run(self)
+
+            return wrapper
 
 
 def get_state_manager(page: Page) -> StateManager:
