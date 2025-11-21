@@ -1,13 +1,68 @@
 # Changelog
 
-All notable changes to Flet-ASP will be documented in this file.
+---
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.3.0] - 2025-11-21
+
+### Added
+- **`@state.action` decorator** - New way to create actions
+  - Previously, only the direct instantiation form `fa.Action()` was available
+  - Decorator automatically detects async functions using `asyncio.iscoroutinefunction()`
+  - Returns appropriate wrapper (sync or async) based on function type
+  - Compatible with Flet's `page.run_task()` for async operations
+  - Cleaner, more Pythonic syntax
+
+```python
+# ✅ NEW: Decorator form (recommended)
+@state.action
+async def clear_completed(get, set):
+    set("tasks", [t for t in get("tasks") if not t["completed"]])
+
+on_click=lambda e: page.run_task(clear_completed)
+
+# Still supported: Direct instantiation
+clear_action = fa.Action(lambda get, set, _: set("tasks", [...]))
+```
+
+### Changed
+- **`StateManager.action()` method**
+  - Added `asyncio.iscoroutinefunction()` check for async detection
+  - Async functions now return `async_wrapper` that properly awaits the action
+  - Sync functions continue to return regular `wrapper`
+
+### Updated
+- **`examples/9_todo.py`** - Updated to use `@state.action` decorator instead of direct instantiation
+- **`examples/testando.py`** - Converted to 100% declarative approach (removed `page.update()`)
 
 ---
 
-## [Unreleased]
+## [0.2.2] - 2025-11-17
+
+### Fixed
+- **`bind_two_way()` handler synchronization**
+  - Fixed `on_change` handler not being called when users typed in TextField controls
+  - Added `control.current.update()` after setting handlers to sync with Flet's backend
+  - Improved value extraction from events prioritizing `e.data`, then `e.control.value`
+
+- **Code quality**: Changed bare `except:` to `except Exception:` (ruff E722)
+
+### Documentation
+- **New section**: "Listen, Selector, and Action: When to use each one?" in README.md
+  - Comparison table of listen(), selector(), action()
+  - Use cases with code examples
+  - Decision tree for choosing which to use
+  - Best practices (DO's and DON'Ts)
+
+### Testing
+- Added `test_bind_two_way_cases.py` with 4 comprehensive tests
+  - Common case: bind after `page.add()`
+  - Uncommon case: bind before `page.add()`
+  - Handler preservation test
+  - Multiple fields test
+
+---
+
+## [0.2.1] - 2025-10-16
 
 ### Added
 - **Selector Memoization** (5-20x performance improvement)
