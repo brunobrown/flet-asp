@@ -1,4 +1,4 @@
-<p align="center"><img src="https://github.com/user-attachments/assets/84c2835b-9356-42ae-8a78-7c3ac11679c1" width="25%" alt="flet-asp"></p>
+<p align="center"><img src="assets/images/flet_asp.gif" width="50%" alt="flet-asp"></p>
 <h1 align="center"> Flet ASP - Flet Atomic State Pattern</h1>
 
 <p align="center">
