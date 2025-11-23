@@ -1,7 +1,10 @@
 <p align="center"><img src="assets/images/flet_asp.gif" width="50%" alt="flet-asp"></p>
-<h1 align="center"> Flet ASP - Flet Atomic State Pattern</h1>
+<h1 align="center"> Flet ASP - Flet Atomic State Pattern</h1></p>
 
 <p align="center">
+<a href="https://github.com/brunobrown/flet-asp/blob/main/LICENSE" target="_blank">
+    <img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="License">
+</a>
 <a href="https://github.com/brunobrown/flet-asp/actions?query=workflow%3AMain+event%3Apush+branch%3Amain" target="_blank">
     <img src="https://github.com/brunobrown/flet-asp/actions/workflows/main.yml/badge.svg?event=push&branch=main" alt="Main">
 </a>
@@ -14,7 +17,9 @@
 <a href="https://pypi.org/project/flet-asp" target="_blank">
     <img src="https://img.shields.io/pypi/pyversions/flet-asp.svg?color=%2334D058" alt="Supported Python versions">
 </a>
-<a href="https://pepy.tech/projects/flet-asp"><img src="https://static.pepy.tech/personalized-badge/flet-asp?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=BRIGHTGREEN&left_text=Downloads" alt="PyPI Downloads"></a>
+<a href="https://pepy.tech/projects/flet-asp"><img src="https://static.pepy.tech/personalized-badge/flet-asp?period=monthly&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=BLUE&left_text=downloads%2Fmonth" alt="PyPI Downloads">
+</a>
+</p>
 
 ---
 
