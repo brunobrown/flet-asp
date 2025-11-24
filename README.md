@@ -464,7 +464,7 @@ await submit_form.run_async(page.state, args={"extra": "data"})
 
 ### 🎯 Decision Tree: Which One To Use?
 
-<img width="1674" height="1978" alt="flow" src="https://github.com/user-attachments/assets/8b3641b5-f9b5-4f91-a330-69efce6e1349" />
+<img width="100%" alt="flow" src="https://github.com/user-attachments/assets/8b3641b5-f9b5-4f91-a330-69efce6e1349" />
 
 
 ---
