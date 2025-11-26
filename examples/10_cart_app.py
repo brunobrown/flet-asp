@@ -22,12 +22,19 @@ class ProductCard(ft.Card):
 
 def main(page: ft.Page):
     """
-    This example demonstrates a shopping cart UI using Flet-ASP state management. It includes:
+    This example demonstrates a shopping cart UI using Flet-ASP state management.
+
+    Key concepts demonstrated:
+        * @selector decorator for derived state (total price, item count)
+        * @action decorator for async operations (clear cart)
+        * listen() for dynamic control list rendering
+        * bind() for simple value updates
+
+    The app includes:
         * A product catalog
         * Cart management with list of items
-        * Derived total price and item count
-        * Reactive updates using selector() and listen()
-        * Cart reset via an async Action
+        * Derived total price and item count (using selectors)
+        * Cart reset via @action decorator
     """
 
     state = fa.get_state_manager(page)
@@ -47,29 +54,36 @@ def main(page: ft.Page):
         {"name": "Keyboard", "price": 300.0},
     ]
 
-    # Selector: total cart price
+    # Selector: total cart price (formatted as string for display)
     @state.selector("total_price")
-    def total_price(get):
-        return sum(item["price"] for item in get("cart_items"))
+    def compute_total_price(get):
+        total = sum(item["price"] for item in get("cart_items"))
+        return f"${total:.2f}"
 
-    # Selector instance: item count
-    item_count_selector = fa.Selector(
-        resolve_atom=state.atom, select_fn=lambda get: len(get("cart_items"))
-    )
+    # Selector: item count (formatted as string for display)
+    @state.selector("item_count")
+    def compute_item_count(get):
+        count = len(get("cart_items"))
+        return f"{count} item(s)"
 
-    # Async Action: clear all items in the cart
-    async def clear_cart(get, set_value, _):
+    # Action: clear all items in the cart using @action decorator
+    @state.action
+    async def clear_cart(_get, set_value):
         set_value("cart_items", [])
 
-    clear_cart_action = fa.Action(clear_cart)
-
-    # Add product to cart
+    # Add product to cart (creates new list for immutability)
     def add_to_cart(item):
         current = state.get("cart_items")
-        state.set("cart_items", current + [item])
+        state.set("cart_items", [*current, item])
 
     # Re-render the cart list when cart changes
     def render_cart_items(_=None):
+        """
+        Render cart items list.
+
+        Note: This uses control.update() because we're dynamically creating
+        a list of controls. For simple value bindings, use state.bind() instead.
+        """
         items = state.get("cart_items")
         cart_list_ref.current.controls = [
             ft.ListTile(
@@ -77,12 +91,8 @@ def main(page: ft.Page):
             )
             for item in items
         ]
+        # Update only this control - required for dynamic control lists
         cart_list_ref.current.update()
-
-    # Update item count badge
-    def update_count(count):
-        item_count_ref.current.value = f"{count} item(s)"
-        item_count_ref.current.update()
 
     # Page UI
     page.title = "🛒 Shopping Cart (Flet-ASP)"
@@ -107,21 +117,19 @@ def main(page: ft.Page):
                 ft.Row([ft.Text("Total: "), ft.Text(ref=total_text_ref)]),
                 ft.OutlinedButton(
                     text="Clear Cart",
-                    on_click=lambda e: page.run_task(
-                        clear_cart_action.run_async, state
-                    ),
+                    on_click=lambda e: page.run_task(clear_cart),
                 ),
             ],
             width=500,
         )
     )
 
-    # Bind computed selector to UI
+    # Bind selectors to UI - fully declarative, no manual update needed!
     state.bind("total_price", total_text_ref, prop="value")
+    state.bind("item_count", item_count_ref, prop="value")
 
-    # Listeners
-    state.listen("cart_items", render_cart_items)
-    item_count_selector.listen(callback=update_count)
+    # Listen for cart changes to render dynamic list
+    state.listen("cart_items", render_cart_items, immediate=False)
 
 
 if __name__ == "__main__":

@@ -2,6 +2,36 @@
 
 ---
 
+## [0.3.1] - 2025-11-25
+
+### Fixed
+- **Async Selectors** - Critical bug fix for async selector functions
+  - Async selectors now properly track dependencies during async execution
+  - Previously, dependencies were not tracked because the async function body wasn't executed until awaited
+  - Added `_schedule_async_with_tracking()` method for proper async initialization
+  - Added `_register_dependency_listeners()` for deferred listener registration
+  - Async selectors now return `None` initially while loading (not a coroutine object)
+  - Multiple scheduling strategies: existing event loop or fallback to separate thread
+
+### Changed
+- **Examples updated to use decorators and declarative patterns**
+  - `5_selector_user_email.py` - Converted to `@state.selector` and `@state.action` decorators with `bind()`
+  - `6_listen_user_login.py` - Converted to `@state.action` decorator with `@state.selector` for derived state
+  - `9_todo.py` - Added explanatory comments for dynamic control list rendering
+  - `10_cart_app.py` - Converted to `@state.selector` and `@state.action` decorators
+  - `11_screen_a_navigation_screen_b.py` - Improved with `on_view_pop` handler and reactive binding on Screen B
+  - `11.1_global_state_outside.py` - Added `on_view_pop` handler and improved comments
+
+- **README.md async selector example simplified**
+  - Removed unnecessary `inspect.iscoroutine()` check
+  - Async selectors now properly return `None` while loading
+
+### Documentation
+- Added explanatory comments about when `control.update()` is necessary (dynamic control lists)
+- Added comments explaining Flet's `page.update()` requirement for navigation
+
+---
+
 ## [0.3.0] - 2025-11-21
 
 ### Added

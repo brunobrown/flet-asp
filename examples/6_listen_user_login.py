@@ -5,11 +5,17 @@ import flet_asp as fa
 
 def main(page: ft.Page):
     """
-    This example shows how to use the listen() method in Flet-ASP to observe changes to a specific atom ("user"), and trigger side effects such as manual UI updates.
-    Instead of binding a control directly to a value (bind()), it listens to a state and reacts accordingly.
+    This example shows how to use listen() in Flet-ASP for side effects,
+    combined with @selector for derived state and @action for async operations.
+
+    Key concepts demonstrated:
+    - @action decorator for async login workflow
+    - @selector decorator for derived welcome message
+    - listen() for side effects (console logging)
+    - bind() for declarative UI updates
 
     * User types credentials and clicks Login
-    * Simulated async login updates a label with a progress counter
+    * Simulated async login with progress updates
     * After login:
         - If valid: shows Welcome, <email>
         - If invalid: shows User not authenticated
@@ -22,40 +28,51 @@ def main(page: ft.Page):
     state.atom("email", "")
     state.atom("password", "")
     state.atom("user", None)
+    state.atom("auth_status", "")  # For progress messages during login
 
     # UI control references
     email_ref = ft.Ref[ft.TextField]()
     password_ref = ft.Ref[ft.TextField]()
     welcome_ref = ft.Ref[ft.Text]()
 
-    # Define the async login action
-    async def login_action(get, set_value, _):
-        # Simulate loading step
+    # Define the async login action using @action decorator
+    @state.action
+    async def login(get, set_value):
+        # Simulate loading step with progress updates
         for i in range(10):
             await asyncio.sleep(0.1)
-            welcome_ref.current.value = f"Authenticating... {i}"
-            welcome_ref.current.update()
+            set_value("auth_status", f"Authenticating... {i}")
 
         # Fake credential validation
         if get("email") == "test@test.com" and get("password") == "123":
             set_value("user", {"email": get("email")})
+            set_value("auth_status", "")  # Clear status on success
         else:
             set_value("user", None)
-
-    # Create the action
-    login = fa.Action(login_action)
+            set_value("auth_status", "")  # Clear status on failure
 
     # Run the action when the button is clicked
-    async def on_login_click(e):
-        await login.run_async(state)
+    def on_login_click(e):
+        page.run_task(login)
 
-    # React to changes in the "user" atom
+    # Selector that derives the welcome message from user and auth_status
+    @state.selector("welcome_message")
+    def get_welcome_message(get):
+        auth_status = get("auth_status")
+        if auth_status:
+            return auth_status  # Show progress during authentication
+
+        user = get("user")
+        if user:
+            return f"Welcome, {user['email']}!"
+        return "User not authenticated."
+
+    # Listen for side effects (e.g., logging) - this is what listen() is best for
     def on_user_change(user_data):
         if user_data:
-            welcome_ref.current.value = f"Welcome, {user_data['email']}!"
+            print(f"[Analytics] User logged in: {user_data['email']}")
         else:
-            welcome_ref.current.value = "User not authenticated."
-        welcome_ref.current.update()
+            print("[Analytics] User logged out or login failed")
 
     # Build the UI
     page.add(
@@ -74,8 +91,11 @@ def main(page: ft.Page):
         ft.Text(ref=welcome_ref),
     )
 
-    # Listen to the "user" atom and reactively update the welcome message
-    state.listen("user", on_user_change)
+    # Bind the selector to the welcome text - fully declarative!
+    state.bind("welcome_message", welcome_ref, prop="value")
+
+    # Listen for side effects (logging, analytics, etc.)
+    state.listen("user", on_user_change, immediate=False)
 
 
 if __name__ == "__main__":

@@ -235,12 +235,8 @@ def settings_page(page: ft.Page, name_ref: ft.Ref, email_ref: ft.Ref) -> ft.Row:
     """
 
     def on_save(e):
-        page.snack_bar = ft.SnackBar(
-            content=ft.Text("Settings saved successfully!"),
-            bgcolor=ft.Colors.GREEN_700,
-        )
-        page.snack_bar.open = True
-        page.update()
+        # Declarative snackbar via state - no page.update() needed
+        page.state.set("snackbar_message", "Settings saved successfully!")
 
     content = ft.Column(
         [

@@ -5,9 +5,12 @@ import flet_asp as fa
 
 def main(page: ft.Page):
     """
-    This example demonstrates how to use a Selector in Flet-ASP to derive and listen to a specific property inside an object (in this case, user["email"]).
-    Instead of binding the entire user atom, this approach focuses only on what matters — the email.
-    The derived value is updated and applied without using bind(), via a manual update.
+    This example demonstrates how to use the @selector decorator in Flet-ASP
+    to derive a specific property from an object (in this case, user["email"]).
+
+    Instead of binding the entire user atom, this approach focuses only on
+    what matters — the email. The derived value is updated automatically
+    via bind() - no manual update needed!
 
     * The user types in credentials and clicks Login
     * If login is successful:
@@ -36,8 +39,9 @@ def main(page: ft.Page):
     email_text_ref = ft.Ref[ft.Text]()
     loading_ref = ft.Ref[ft.ProgressRing]()
 
-    # Define the async login action
-    async def login_action(get, set_value, _):
+    # Define the async login action using @action decorator
+    @state.action
+    async def login(get, set_value):
         set_value("loading", True)
         set_value("error", "")
         await asyncio.sleep(1)
@@ -50,29 +54,16 @@ def main(page: ft.Page):
 
         set_value("loading", False)
 
-    # Create the action instance
-    login = fa.Action(login_action)
-
     # Trigger login on button click
-    async def on_login_click(e):
-        await login.run_async(state)
+    def on_login_click(e):
+        page.run_task(login)
 
-    # Selector that watches only the user's email
-    user_email_selector = fa.Selector(
-        resolve_atom=state.atom,
-        select_fn=lambda get: (get("user") or {}).get("email", ""),
-    )
-
-    # Update the Text control manually when the selector changes
-    def update_email_text(value):
-        email_text_ref.current.value = value
-        email_text_ref.current.update()
-
-    # Listen to the selector and apply changes to the control
-    user_email_selector.listen(
-        callback=update_email_text,
-        immediate=False,  # skip first call (optional)
-    )
+    # Selector that derives only the user's email from the user object
+    # This is more efficient than watching the entire user object
+    @state.selector("user_email")
+    def get_user_email(get):
+        user = get("user")
+        return (user or {}).get("email", "")
 
     # Build the UI layout
     page.add(
@@ -93,9 +84,10 @@ def main(page: ft.Page):
         ft.Text(ref=email_text_ref, color="green"),  # updated by Selector
     )
 
-    # Bind loading and error states to controls
+    # Bind states to controls - fully declarative, no manual update needed!
     state.bind("loading", loading_ref, prop="visible")
     state.bind("error", error_ref, prop="value")
+    state.bind("user_email", email_text_ref, prop="value")  # Bind selector to text
 
 
 if __name__ == "__main__":

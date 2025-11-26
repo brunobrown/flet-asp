@@ -475,17 +475,18 @@ class ReactiveProgress(ReactiveAtom):
             spacing=10,
         )
 
-        # Custom binding with transformation
-        # Since bind_dynamic doesn't support transform functions,
-        # we use listen() to manually update the controls
-        def update_progress(value):
-            if self.progress_ref.current:
-                self.progress_ref.current.value = value / self.max_value
-            if self.text_ref.current:
-                self.text_ref.current.value = f"{int((value / self.max_value) * 100)}%"
-            page.update()
+        # Create selectors for derived values (progress bar value and percentage text)
+        @page.state.selector(f"{atom_key}_bar_value")
+        def compute_bar_value(get):
+            return get(atom_key) / self.max_value
 
-        page.state.listen(atom_key, update_progress, immediate=True)
+        @page.state.selector(f"{atom_key}_percentage")
+        def compute_percentage(get):
+            return f"{int((get(atom_key) / self.max_value) * 100)}%"
+
+        # Bind selectors to UI controls - fully declarative, no page.update() needed
+        page.state.bind(f"{atom_key}_bar_value", self.progress_ref, prop="value")
+        page.state.bind(f"{atom_key}_percentage", self.text_ref, prop="value")
 
     def increment(self, amount: int = 1):
         """Increment progress."""

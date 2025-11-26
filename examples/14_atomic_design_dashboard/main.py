@@ -77,6 +77,21 @@ def main(page: ft.Page):
     # Search state
     page.state.atom("search_query", "")
 
+    # Snackbar state (for declarative notifications)
+    page.state.atom("snackbar_message", "")
+
+    # Listener to show snackbar when message changes
+    def show_snackbar(message: str):
+        if message:
+            snack = ft.SnackBar(
+                content=ft.Text(message),
+                bgcolor=ft.Colors.GREEN_700,
+            )
+            page.open(snack)  # page.open() handles the update automatically
+            page.state.set("snackbar_message", "")  # Reset after showing
+
+    page.state.listen("snackbar_message", show_snackbar)
+
     # ========================================================================
     # REFS FOR UI BINDINGS
     # ========================================================================
@@ -152,8 +167,6 @@ def main(page: ft.Page):
             page.state.bind("revenue", revenue_ref, prop="value")
             page.state.bind("orders", orders_ref, prop="value")
             page.state.bind("growth", growth_ref, prop="value")
-
-        page.update()
 
     # Listen to view changes
     page.state.listen("current_view", lambda value: render_view(value))
