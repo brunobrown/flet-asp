@@ -145,6 +145,14 @@ def main(page: ft.Page):
         state.set("filter", tab_text)
 
     def render_tasks(_=None):
+        """
+        Render the task list based on current filter.
+
+        Note: This uses control.update() because we're dynamically creating
+        a list of controls. For simple value bindings, use state.bind() instead.
+        When replacing control.controls with a new list, you need to call
+        control.update() to refresh that specific control.
+        """
         tasks = state.get("tasks")
         current_filter = state.get("filter")
 
@@ -161,6 +169,7 @@ def main(page: ft.Page):
             TaskItem(t, toggle_task, delete_task, edit_task, save_task)
             for t in filtered
         ]
+        # Update only this control (not page.update()) - required for dynamic control lists
         tasks_column_ref.current.update()
 
     # Selector: count active tasks
@@ -170,8 +179,8 @@ def main(page: ft.Page):
 
     # Action: clear completed tasks
     @state.action
-    async def clear_completed(get, set):
-        set("tasks", [t for t in get("tasks") if not t["completed"]])
+    async def clear_completed(get, set_value):
+        set_value("tasks", [t for t in get("tasks") if not t["completed"]])
 
     # UI layout
     page.title = "ToDo App (Flet-ASP)"

@@ -270,15 +270,18 @@ def main(page: ft.Page):
 
     form_result_text = ft.Ref[ft.Text]()
 
+    # Atom for form result - declarative approach
+    page.state.atom("form_result", "")
+
     def handle_form_submit(data):
         """Handle form submission."""
-        form_result_text.current.value = (
+        result = (
             f"✅ Form Submitted!\n\n"
             f"Name: {data['name']}\n"
             f"Email: {data['email']}\n"
             f"Password: {'*' * len(data['password'])}"
         )
-        page.update()
+        page.state.set("form_result", result)  # No page.update() needed
 
     # Create reactive form
     user_form = ReactiveForm(
@@ -340,6 +343,9 @@ def main(page: ft.Page):
         bgcolor=ft.Colors.PURPLE_50,
         border=ft.border.all(1, ft.Colors.PURPLE_200),
     )
+
+    # Bind form result to text - declarative, no page.update() needed
+    page.state.bind("form_result", form_result_text, prop="value")
 
     # ========================================================================
     # SECTION 4: REACTIVE PROGRESS

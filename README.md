@@ -125,6 +125,7 @@ def main(page: ft.Page):
     # Create atoms for form fields
     page.state.atom("email", "")
     page.state.atom("password", "")
+    page.state.atom("message", "")  # Atom for login message
 
     # UI references
     email_field = ft.Ref[ft.TextField]()
@@ -136,10 +137,10 @@ def main(page: ft.Page):
         password = page.state.get("password")
 
         if email == "user@example.com" and password == "123":
-            message_text.current.value = f"Welcome, {email}!"
+            page.state.set("message", f"Welcome, {email}!")
         else:
-            message_text.current.value = "Invalid credentials"
-        page.update()
+            page.state.set("message", "Invalid credentials")
+        # No page.update() needed - bind() handles it!
 
     page.add(
         ft.Column([
@@ -154,6 +155,7 @@ def main(page: ft.Page):
     # Two-way binding: TextField ↔ Atom
     page.state.bind_two_way("email", email_field)
     page.state.bind_two_way("password", password_field)
+    page.state.bind("message", message_text)  # One-way binding for message
 
 ft.app(target=main)
 ```
@@ -226,6 +228,7 @@ def main(page: ft.Page):
 
     page.state.atom("user", None)
     page.state.atom("loading", False)
+    page.state.atom("status", "")  # Atom for status message
 
     # Define async action
     async def login_action(get, set_value, params):
@@ -264,17 +267,15 @@ def main(page: ft.Page):
 
         user = page.state.get("user")
         if user:
-            status_text.current.value = f"Welcome, {user['name']}!"
+            page.state.set("status", f"Welcome, {user['name']}!")
         else:
-            status_text.current.value = "Login failed"
-        page.update()
+            page.state.set("status", "Login failed")
+        # No page.update() needed - bind() handles it!
 
-    # Listen to loading state
-    def on_loading_change(is_loading):
-        status_text.current.value = "Logging in..." if is_loading else ""
-        page.update()
-
-    page.state.listen("loading", on_loading_change)
+    # Selector to derive status from loading state
+    @page.state.selector("loading_status")
+    def compute_loading_status(get):
+        return "Logging in..." if get("loading") else get("status")
 
     page.add(
         ft.Column([
@@ -285,6 +286,9 @@ def main(page: ft.Page):
             ft.Text(ref=status_text)
         ])
     )
+
+    # Bind selector to status text - fully declarative!
+    page.state.bind("loading_status", status_text)
 
 ft.app(target=main)
 ```
@@ -950,24 +954,18 @@ def main(page: ft.Page):
     # UI
     user_info = ft.Ref[ft.Text]()
 
-    def update_user_info(user_data):
-        # Async selectors may return coroutines on first call, check the type
-        import inspect
-        if inspect.iscoroutine(user_data):
-            # Skip coroutine objects - they will be resolved automatically
-            return
-        if user_data:
-            user_info.current.value = f"{user_data['name']} ({user_data['email']})"
-        else:
-            user_info.current.value = "Loading..."
-        page.update()
+    # Selector to format user info (depends on async selector)
+    @page.state.selector("user_display")
+    def format_user_display(get):
+        user_data = get("user_data")
+        # Async selectors return None while loading
+        if user_data is None:
+            return "Loading..."
+        return f"{user_data['name']} ({user_data['email']})"
 
     def next_user(e):
         current_id = page.state.get("user_id")
         page.state.set("user_id", (current_id % 3) + 1)
-
-    # Listen to selector changes
-    page.state.listen("user_data", update_user_info)
 
     page.add(
         ft.Column([
@@ -976,6 +974,9 @@ def main(page: ft.Page):
             ft.ElevatedButton("Next User", on_click=next_user)
         ])
     )
+
+    # Bind selector to text - no page.update() needed!
+    page.state.bind("user_display", user_info)
 
 ft.app(target=main)
 ```
@@ -1000,12 +1001,14 @@ def main(page: ft.Page):
     @page.state.selector("cart_total")
     def calculate_total(get):
         items = get("cart_items")
-        return sum(item["price"] * item["quantity"] for item in items)
+        total = sum(item["price"] * item["quantity"] for item in items)
+        return f"Total: ${total:.2f}"
 
     @page.state.selector("cart_count")
     def count_items(get):
         items = get("cart_items")
-        return sum(item["quantity"] for item in items)
+        count = sum(item["quantity"] for item in items)
+        return f"Items: {count}"
 
     # Available products
     products = [
@@ -1026,13 +1029,22 @@ def main(page: ft.Page):
         existing = next((item for item in items if item["id"] == product["id"]), None)
 
         if existing:
-            existing["quantity"] += 1
+            # Create new list with updated item (immutable update)
+            new_items = [
+                {**item, "quantity": item["quantity"] + 1} if item["id"] == product["id"] else item
+                for item in items
+            ]
         else:
-            items.append({**product, "quantity": 1})
+            # Create new list with new item
+            new_items = [*items, {**product, "quantity": 1}]
 
-        page.state.set("cart_items", items)
+        page.state.set("cart_items", new_items)
 
     def render_cart():
+        """
+        Note: This uses page.update() because we're dynamically creating
+        control lists. For simple value bindings, use state.bind() instead.
+        """
         items = page.state.get("cart_items")
 
         cart_list.current.controls = [
@@ -1043,10 +1055,10 @@ def main(page: ft.Page):
             ) for item in items
         ] if items else [ft.Text("Cart is empty")]
 
-        page.update()
+        cart_list.current.update()  # Update only the cart list, not the whole page
 
-    # Listen to cart changes
-    page.state.listen("cart_items", lambda _: render_cart())
+    # Listen to cart changes (immediate=False to avoid calling before UI is mounted)
+    page.state.listen("cart_items", lambda _: render_cart(), immediate=False)
 
     # Build UI
     page.add(
@@ -1146,6 +1158,7 @@ Explore the [`examples/`](./examples/) folder for complete applications:
 - [`14_atomic_design_dashboard/`](./examples/14_atomic_design_dashboard/) - Complete dashboard with atoms, molecules, organisms, templates, and pages
 - [`15_atomic_design_theming/`](./examples/15_atomic_design_theming/) - Theme-aware component library with design tokens
 - [`16_reactive_atomic_components/`](./examples/16_reactive_atomic_components/) - Reactive components with built-in state management
+- [`17_atomic_design_send_button/`](./examples/17_atomic_design_send_button/) - Send button with reactive state management
 
 ---
 

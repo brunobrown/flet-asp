@@ -29,26 +29,37 @@ def screen_a(page: ft.Page):
 
 def screen_b(page: ft.Page):
     """Secondary screen displaying the same counter."""
+    count_ref = ft.Ref[ft.Text]()
 
     def go_back(e):
         page.go("/")
 
-    return ft.View(
+    view = ft.View(
         "/b",
         [
-            ft.Text(f"Screen B — Count is still: {page.state.get('count')}"),
+            ft.Text("Screen B — Count is still: ", spans=[ft.TextSpan(ref=count_ref)]),
             ft.ElevatedButton("Go back", on_click=go_back),
         ],
     )
 
+    # Bind count to show current value reactively
+    page.state.bind("count", count_ref, prop="text")
+    return view
+
 
 def main(page: ft.Page):
-    """App entry point."""
+    """
+    App entry point.
+
+    Navigation pattern using page.views stack.
+    Note: page.go() triggers on_route_change which modifies page.views.
+    page.update() is required by Flet after modifying page.views.
+    """
     fa.get_state_manager(page)
     page.state.atom("count", 0)
 
     def route_change(e):
-        # Clear views before switching
+        # Clear views and rebuild based on route
         page.views.clear()
 
         if page.route == "/b":
@@ -56,9 +67,18 @@ def main(page: ft.Page):
         else:
             page.views.append(screen_a(page))
 
+        # Required by Flet when manually modifying page.views for navigation
+        # This is a Flet requirement, not related to Flet-ASP state management
         page.update()
 
+    def view_pop(e):
+        page.views.pop()
+        top_view = page.views[-1] if page.views else None
+        if top_view:
+            page.go(top_view.route)
+
     page.on_route_change = route_change
+    page.on_view_pop = view_pop
     page.go("/")
 
 

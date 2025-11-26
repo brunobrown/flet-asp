@@ -56,22 +56,106 @@ class Selector(Atom):
         """
         Registers the dependencies of the selector by calling the `select_fn`
         with a special getter that tracks the accessed keys.
+
+        Handles both sync and async selector functions. For async selectors,
+        the initial value is set to None until the coroutine completes, and
+        dependency tracking happens during async execution.
         """
+        # Check if selector function is async
+        if asyncio.iscoroutinefunction(self._select_fn):
+            # For async selectors, set initial value to None
+            self._value = None
+            # Run the initial async computation with dependency tracking
+            self._schedule_async_with_tracking()
+        else:
+            # Sync selector - track dependencies during initial call
+            def getter(key: str):
+                self._dependencies.add(key)
+                value = self._get_atom(key).value
+                # Cache initial dependency values for memoization
+                self._cached_deps[key] = value
+                return value
 
-        def getter(key: str):
-            self._dependencies.add(key)
-            value = self._get_atom(key).value
-            # Cache initial dependency values for memoization
-            self._cached_deps[key] = value
-            return value
+            # Initial value computation
+            self._value = self._select_fn(getter)
 
-        # Initial value computation
-        self._value = self._select_fn(getter)
+            # Register listeners for each dependency
+            self._register_dependency_listeners()
 
-        # Register listeners for each dependency
+    def _register_dependency_listeners(self):
+        """
+        Registers listeners for all tracked dependencies.
+        Called after dependencies are known (sync or async).
+        """
         for key in self._dependencies:
             atom = self._get_atom(key)
-            atom.listen(self._on_dependency_change, immediate=False)
+            # Check if listener already registered to avoid duplicates
+            if not any(cb == self._on_dependency_change for cb in atom._listeners):
+                atom.listen(self._on_dependency_change, immediate=False)
+
+    def _schedule_async_with_tracking(self):
+        """
+        Schedules the initial async selector computation with dependency tracking.
+        This is used for async selectors where dependencies are tracked during execution.
+        """
+        # Create a tracking getter for the async call
+        tracked_deps: set[str] = set()
+        cached_values: dict[str, Any] = {}
+
+        def tracking_getter(key: str):
+            tracked_deps.add(key)
+            value = self._get_atom(key).value
+            cached_values[key] = value
+            return value
+
+        async def run_with_tracking():
+            try:
+                result = await self._select_fn(tracking_getter)
+                # Update dependencies and cache after successful execution
+                self._dependencies = tracked_deps
+                self._cached_deps = cached_values
+                # Register listeners now that we know the dependencies
+                self._register_dependency_listeners()
+                # Set the value (this will notify listeners)
+                self._set_value(result)
+            except Exception as e:
+                print(f"[Selector async error]: {e}")
+
+        # Schedule the coroutine
+        try:
+            loop = asyncio.get_running_loop()
+            asyncio.ensure_future(run_with_tracking(), loop=loop)
+        except RuntimeError:
+            # No running event loop - run in a separate thread
+            def run_in_thread():
+                asyncio.run(run_with_tracking())
+
+            thread = threading.Thread(target=run_in_thread, daemon=True)
+            thread.start()
+
+    def _schedule_async(self, coro):
+        """
+        Schedules an async coroutine to run and update the selector value.
+
+        Tries multiple strategies to run the coroutine:
+        1. Use existing event loop if available
+        2. Create a new task in the running loop
+        3. Run in a new thread with its own event loop as fallback
+
+        Args:
+            coro (Coroutine): The coroutine to schedule.
+        """
+        try:
+            loop = asyncio.get_running_loop()
+            # If we have a running loop, create a task
+            asyncio.ensure_future(self._handle_async(coro), loop=loop)
+        except RuntimeError:
+            # No running event loop - run in a separate thread
+            def run_in_thread():
+                asyncio.run(self._handle_async(coro))
+
+            thread = threading.Thread(target=run_in_thread, daemon=True)
+            thread.start()
 
     def _on_dependency_change(self, _):
         """
@@ -129,7 +213,7 @@ class Selector(Atom):
             result = self._select_fn(getter)
 
             if asyncio.iscoroutine(result):
-                asyncio.create_task(self._handle_async(result))
+                self._schedule_async(result)
             else:
                 self._set_value(result)
 

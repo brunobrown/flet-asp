@@ -112,7 +112,13 @@ def screen_b(page: ft.Page):
 
 
 def main(page: ft.Page):
-    """App entry point."""
+    """
+    App entry point.
+
+    Navigation pattern using page.views stack with global state.
+    Note: page.go() triggers on_route_change which modifies page.views.
+    page.update() is required by Flet after modifying page.views.
+    """
     page.title = "Global State Outside Page"
     page.theme_mode = ft.ThemeMode.LIGHT
 
@@ -124,7 +130,7 @@ def main(page: ft.Page):
     global_state.atom("count", 0)
 
     def route_change(e):
-        # Clear views before switching
+        # Clear views and rebuild based on route
         page.views.clear()
 
         if page.route == "/b":
@@ -132,9 +138,18 @@ def main(page: ft.Page):
         else:
             page.views.append(screen_a(page))
 
+        # Required by Flet when manually modifying page.views for navigation
+        # This is a Flet requirement, not related to Flet-ASP state management
         page.update()
 
+    def view_pop(e):
+        page.views.pop()
+        top_view = page.views[-1] if page.views else None
+        if top_view:
+            page.go(top_view.route)
+
     page.on_route_change = route_change
+    page.on_view_pop = view_pop
     page.go("/")
 
 
